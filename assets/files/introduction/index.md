@@ -68,9 +68,9 @@ involve instantiating the optimization problem in
 $$(\ref{eq:learning_gm})$$ in a suitable way. In this course, we will be
 primarily interested in the following questions:
 
-**   What is the representation for the model family $$\mathcal{M}$$?
-**   What is the objective function $$d(\cdot)$$?
-**  What is the optimization procedure for minimizing $$d(\cdot)$$?
+*  What is the representation for the model family $$\mathcal{M}$$?
+*  What is the objective function $$d(\cdot)$$?
+*  What is the optimization procedure for minimizing $$d(\cdot)$$?
 
 In the next few set of lectures, we will take a deeper dive into certain
 families of generative models. For each model family, we will note how
