@@ -4,7 +4,7 @@ subtitle: Lecture notes
 author: Aditya Grover
 simple_search: http://google.com/search
 description: Lecture notes for Deep Generative Models.
-name: otes
+name: notes
 markdown_ext: "markdown,mkdown,mkdn,mkd,md"
 permalink: /articles/:short_year/:title
 timezone: America/New_York
