@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+
+<!-- Begin Jekyll SEO tag v2.4.0 -->
+<title>IJCAI-ECAI 2018 Tutorial on Deep Generative Models | Deep Generative Models</title>
+<meta name="generator" content="Jekyll v3.6.2" />
+<meta property="og:title" content="IJCAI-ECAI 2018 Tutorial on Deep Generative Models" />
+<meta name="author" content="Aditya Grover" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Aditya Grover and Stefano Ermon" />
+<meta property="og:description" content="Aditya Grover and Stefano Ermon" />
+<meta property="og:site_name" content="Deep Generative Models" />
+<script type="application/ld+json">
+{"name":"Deep Generative Models","description":"Aditya Grover and Stefano Ermon","author":{"@type":"Person","name":"Aditya Grover"},"@type":"WebSite","url":"/generative-models/","headline":"IJCAI-ECAI 2018 Tutorial on Deep Generative Models","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#157878">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="/generative-models/assets/css/style.css?v=">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Deep Generative Models</h1>
+      <h2 class="project-tagline">Aditya Grover and Stefano Ermon</h2>
+      
+      
+    </section>
+
+    <section class="main-content">
+      <h1 id="venue">Venue</h1>
+<p><a href="https://www.ijcai-18.org/">27th International Joint Conference on Artificial Intelligence and the 23rd European Conference on Artificial Intelligence</a><br />
+July 13-19, 2018<br />
+Stockholm, Sweden</p>
+
+<p>Part of the <a href="http://www.ijcai-18.org/wp-content/uploads/2018/03/FAIM18ScheduleDraft5.pdf">Federated AI Meeting</a>, that includes the AAMAS, ICML, ICCBR, and SoCS conferences.</p>
+
+<h1 id="abstract">Abstract</h1>
+
+<p>Generative models are a key paradigm for probabilistic reasoning within graphical models and probabilistic programming languages. Recent advancements in parameterizing these models using neural networks and stochastic optimization using gradient-based techniques have enabled scalable modeling of high-dimensional data across a breadth of modalities and applications.</p>
+
+<p>The first half of this tutorial will provide a holistic review of the major families of deep generative models, including generative adversarial networks, variational autoencoders, and autoregressive models. For each of these models, we will discuss the probabilistic formulations, learning algorithms, and relationships with other models. The second half of the tutorial will demonstrate approaches for using deep generative models on a representative set of downstream inference tasks: semi-supervised learning, imitation learning, defence against adversarial examples, and compressed sensing. Finally, we will conclude with a discussion of the current challenges in the field and promising avenues for future research.</p>
+
+<h1 id="speakers">Speakers</h1>
+
+<h3 id="aditya-grover"><a href="http://aditya-grover.github.io/">Aditya Grover</a></h3>
+<p><img src="assets/images/aditya.jpg" width="150" height="175" /></p>
+
+<p>Aditya Grover is a Ph.D student in the Computer Science Department at Stanford University, where he is advised by Stefano Ermon and affiliated with the Artificial Intelligence Laboratory and the Statistical Machine Learning Group. His research interests span generative modeling, statistical relational learning, and applications of artificial intelligence for improving society and environment. His research honors include a Microsoft Research PhD Fellowship in machine learning and a best paper award at the international workshop on statistical relational artificial intelligence (StarAI), 2016. Prior to joining Stanford, Aditya obtained his undergraduate degree in Computer Science and Engineering from Indian Institute of Technology (IIT), Delhi in 2015 where he was awarded the best undergraduate experimental project thesis award.</p>
+
+<h3 id="stefano-ermon"><a href="https://cs.stanford.edu/~ermon/">Stefano Ermon</a></h3>
+
+<p><img src="assets/images/stefano.jpg" width="150" height="175" /></p>
+
+<p>Stefano Ermon is an Assistant Professor in the Computer Science Department at Stanford University, where he is affiliated with the Artificial Intelligence Laboratory, and a fellow of the Woods Institute for the Environment. His research is centered on techniques for probabilistic modeling of data, inference, and optimization, and is motivated by a range of applications, in particular ones in the emerging field of computational sustainability. He has won several awards, including four Best Paper Awards (AAAI, UAI and CP), a NSF Career Award, an ONR Young Investigator Award, a Sony Faculty Innovation Award, an AWS Machine Learning Award, a Hellman Faculty Fellowship, and the IJCAI Computers and Thought Award. Stefano earned his Ph.D. in Computer Science at Cornell University in 2015.</p>
+
+<h1 id="outline-for-the-tutorial">Outline for the tutorial</h1>
+
+<p><strong>First session (duration: 1 hour and 30 minutes from 2-3:30 pm)</strong></p>
+
+<ul>
+  <li>Motivation for generative modeling and contrasts with discriminative models.</li>
+  <li>Definition and characteristics of a generative model: estimate densities, simulate data, learn representations.</li>
+  <li>Traditional approaches to generative modeling and the role of deep neural networks for effective parameterization.</li>
+  <li>Taxonomy of generative model based on learning algorithms: likelihood-based vs. likelihood-free learning.</li>
+  <li>Likelihood-based learning instantiations:
+    <ul>
+      <li>Autoregressive Models (directed, fully observed)</li>
+      <li>Variational Autoencoders (directed, latent variable)</li>
+    </ul>
+  </li>
+</ul>
+
+<p><strong>Second session (duration: 2 hours from 4-6 pm)</strong></p>
+
+<ul>
+  <li>Likelihood-based learning instantiations(continued):
+    <ul>
+      <li>Normalizing Flow Models (directed, latent variable)</li>
+    </ul>
+  </li>
+  <li>Likelihood-free learning instantiations:
+    <ul>
+      <li>Generative Adversarial Networks (directed, latent variable)</li>
+    </ul>
+  </li>
+  <li>Applications of deep generative models
+    <ul>
+      <li>Semi-supervised learning</li>
+      <li>Imitation learning</li>
+      <li>Adversarial examples</li>
+      <li>Compressed sensing</li>
+    </ul>
+  </li>
+  <li>Discussion on key challenges and outlook towards future research in generative models.</li>
+</ul>
+
+<h1 id="slides">Slides</h1>
+
+<p>The slides for the tutorial are available <a href="https://drive.google.com/file/d/1uwvXkKfrOjYsRKLO7RK4KbvpWmu_YPN_/view?usp=sharing">here</a>.</p>
+
+<h1 id="related-surveys-and-tutorials">Related surveys and tutorials</h1>
+
+<ol>
+  <li><a href="https://www.cs.cmu.edu/~rsalakhu/papers/annrev.pdf">Learning deep generative models.</a> Ruslan Salakhutdinov. Annual Review of Statistics and Its Application, April 2015.</li>
+  <li><a href="https://www.youtube.com/watch?v=AJVyzd0rqdc">Tutorial on Generative Adversarial Networks.</a> Ian Goodfellow. Neural Information Processing Systems, December 2016.</li>
+  <li><a href="https://www.youtube.com/watch?v=JrO5fSskISY">Tutorial on Deep Generative Models.</a> Shakir Mohamed and Danilo Rezende. Uncertainty in Artificial Intelligence, July 2017.</li>
+  <li><a href="https://sites.google.com/view/cvpr2018tutorialongans/">Tutorial on Generative Adversarial Networks.</a> Computer Vision and Pattern Recognition, June 2018.</li>
+</ol>
+
+
+
+      <footer class="site-footer">
+        
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a>.</span>
+      </footer>
+    </section>
+
+    
+  </body>
+</html>
