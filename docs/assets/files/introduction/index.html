@@ -97,7 +97,7 @@ learned model for downstream <em>inference</em>.</p>
 <h2 id="learning">Learning</h2>
 
 <p>We will be primarily interested in parametric approximations to the data
-distribution, which summarize all the information about <script type="math/tex">\mathcal{D}</script> in
+distribution, which summarize all the information about the dataset <script type="math/tex">\mathcal{D}</script> in
 a finite set of parameters. In contrast with non-parametric models,
 parametric models scale more efficiently with large datasets but are
 limited in the family of distributions they can represent.</p>
@@ -107,21 +107,21 @@ generative model as picking the parameters within a family of model
 distributions that minimizes some notion of distance<sup id="fnref:1"><a href="#fn:1" class="footnote">1</a></sup> between the
 model distribution and the data distribution.</p>
 
-<p>TODO: figure</p>
+<p><img src="learning.png" alt="learning" /></p>
 
-<p>For instance, we might be given access to a dataset of dog images and
-our goal is to learn a generative model <script type="math/tex">p_{\theta}</script> such that
-<script type="math/tex">p_\theta</script> is close to the distribution over images over dogs
+<p>For instance, we might be given access to a dataset of dog images <script type="math/tex">\mathcal{D}</script> and
+our goal is to learn the paraemeters of  a generative model <script type="math/tex">\theta</script> within a model family <script type="math/tex">\mathcal{M}</script> such that
+the model distribution <script type="math/tex">p_\theta</script> is close to the data distribution over dogs
 <script type="math/tex">p_{\mathrm{data}}</script>. Mathematically, we can specify our goal as the
 following optimization problem: <script type="math/tex"></script>\begin{equation}
 \min_{\theta\in \mathcal{M}}d(p_{\mathrm{data}}, p_{\theta})
 \label{eq:learning_gm}
 \tag{1}
 \end{equation}<script type="math/tex"></script>where <script type="math/tex">p_{\mathrm{data}}</script> is accessed via the dataset
-<script type="math/tex">\mathcal{D}</script>.</p>
+<script type="math/tex">\mathcal{D}</script> and <script type="math/tex">d(\cdot)</script> is a notion of distance between probability distributions.</p>
 
 <p>As we navigate through this course, it is interesting to take note of
-the difficulty of this problem at hand. A typical image from a modern
+the difficulty of the problem at hand. A typical image from a modern
 phone camera has a resolution of approximately <script type="math/tex">700 \times 1400</script> pixels.
 Each pixel has three channels: R(ed), G(reen) and B(lue) and each
 channel can take a value between 0 to 255. Hence, the number of possible
@@ -165,16 +165,16 @@ queries for evaluating a generative model.:</p>
 
 <ol>
   <li>
-    <p>Density estimation: Given a datapoint <script type="math/tex">\mathbf{x}</script>, what is the
+    <p><em>Density estimation:</em> Given a datapoint <script type="math/tex">\mathbf{x}</script>, what is the
 probability assigned by the model, i.e., <script type="math/tex">p_\theta(\mathbf{x})</script>?</p>
   </li>
   <li>
-    <p>Sampling: How can we <em>generate</em> novel data from the model
+    <p><em>Sampling:</em> How can we <em>generate</em> novel data from the model
 distribution, i.e.,
 <script type="math/tex">\mathbf{x}_{\mathrm{new}} \sim p_\theta(\mathbf{x})</script>?</p>
   </li>
   <li>
-    <p>Unsupervised representation learning: How can we learn meaningful
+    <p><em>Unsupervised representation learning:</em> How can we learn meaningful
 feature representations for a datapoint <script type="math/tex">\mathbf{x}</script>?</p>
   </li>
 </ol>
@@ -196,8 +196,8 @@ metrics often fail to reflect desirable qualitative attributes in the
 generated samples and the learned representations. Secondly, not all
 model families permit efficient and accurate inference on all these
 tasks. Indeed, the trade-offs in the inference capabilities of the
-current families of generative models have led to the development of as
-we shall see next.</p>
+current generative models have led to the development of very diverse approaches as
+we shall see in this course.</p>
 
 <div class="footnotes">
   <ol>

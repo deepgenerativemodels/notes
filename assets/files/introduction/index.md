@@ -24,7 +24,7 @@ Learning
 --------
 
 We will be primarily interested in parametric approximations to the data
-distribution, which summarize all the information about $$\mathcal{D}$$ in
+distribution, which summarize all the information about the dataset $$\mathcal{D}$$ in
 a finite set of parameters. In contrast with non-parametric models,
 parametric models scale more efficiently with large datasets but are
 limited in the family of distributions they can represent.
@@ -34,21 +34,22 @@ generative model as picking the parameters within a family of model
 distributions that minimizes some notion of distance[^1] between the
 model distribution and the data distribution.
 
-TODO: figure
+![learning](learning.png)
 
-For instance, we might be given access to a dataset of dog images and
-our goal is to learn a generative model $$p_{\theta}$$ such that
-$$p_\theta$$ is close to the distribution over images over dogs
+
+For instance, we might be given access to a dataset of dog images $$\mathcal{D}$$ and
+our goal is to learn the paraemeters of  a generative model $$\theta$$ within a model family $$\mathcal{M}$$ such that
+the model distribution $$p_\theta$$ is close to the data distribution over dogs
 $$p_{\mathrm{data}}$$. Mathematically, we can specify our goal as the
 following optimization problem: $$$$\begin{equation}
 \min_{\theta\in \mathcal{M}}d(p_{\mathrm{data}}, p_{\theta})
 \label{eq:learning_gm}
 \tag{1}
 \end{equation}$$$$where $$p_{\mathrm{data}}$$ is accessed via the dataset
-$$\mathcal{D}$$.
+$$\mathcal{D}$$ and $$d(\cdot)$$ is a notion of distance between probability distributions.
 
 As we navigate through this course, it is interesting to take note of
-the difficulty of this problem at hand. A typical image from a modern
+the difficulty of the problem at hand. A typical image from a modern
 phone camera has a resolution of approximately $$700 \times 1400$$ pixels.
 Each pixel has three channels: R(ed), G(reen) and B(lue) and each
 channel can take a value between 0 to 255. Hence, the number of possible
@@ -68,9 +69,9 @@ involve instantiating the optimization problem in
 $$(\ref{eq:learning_gm})$$ in a suitable way. In this course, we will be
 primarily interested in the following questions:
 
-*  What is the representation for the model family $$\mathcal{M}$$?
-*  What is the objective function $$d(\cdot)$$?
-*  What is the optimization procedure for minimizing $$d(\cdot)$$?
+* What is the representation for the model family $$\mathcal{M}$$?
+* What is the objective function $$d(\cdot)$$?
+* What is the optimization procedure for minimizing $$d(\cdot)$$?
 
 In the next few set of lectures, we will take a deeper dive into certain
 families of generative models. For each model family, we will note how
@@ -89,14 +90,14 @@ While the range of applications to which generative models have been
 used continue to grow, we can identify three fundamental inference
 queries for evaluating a generative model.:
 
-1.  Density estimation: Given a datapoint $$\mathbf{x}$$, what is the
+1.  *Density estimation:* Given a datapoint $$\mathbf{x}$$, what is the
     probability assigned by the model, i.e., $$p_\theta(\mathbf{x})$$?
 
-2.  Sampling: How can we *generate* novel data from the model
+2.  *Sampling:* How can we *generate* novel data from the model
     distribution, i.e.,
     $$\mathbf{x}_{\mathrm{new}} \sim p_\theta(\mathbf{x})$$?
 
-3.  Unsupervised representation learning: How can we learn meaningful
+3.  *Unsupervised representation learning:* How can we learn meaningful
     feature representations for a datapoint $$\mathbf{x}$$?
 
 Going back to our example of learning a generative model over dog
@@ -116,8 +117,8 @@ metrics often fail to reflect desirable qualitative attributes in the
 generated samples and the learned representations. Secondly, not all
 model families permit efficient and accurate inference on all these
 tasks. Indeed, the trade-offs in the inference capabilities of the
-current families of generative models have led to the development of as
-we shall see next.
+current generative models have led to the development of very diverse approaches as
+we shall see in this course.
 
 [^1]: As we shall see later, functions that do not satisfy all
     properties of a distance metric are also used in practice, e.g., KL

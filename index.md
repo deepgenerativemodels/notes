@@ -11,7 +11,7 @@ You too may help make these notes better by submitting your improvements to us v
 
 1. [Introduction](assets/files/introduction/)
 
-2. [Autoregressive Models](assets/files/autoregressive/)
+2. Autoregressive Models
 
 3. [Variational Autoencoders] Coming soon!
 
