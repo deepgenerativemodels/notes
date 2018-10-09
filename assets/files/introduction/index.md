@@ -120,6 +120,9 @@ tasks. Indeed, the trade-offs in the inference capabilities of the
 current generative models have led to the development of very diverse approaches as
 we shall see in this course.
 
+
+## Footnotes
+
 [^1]: As we shall see later, functions that do not satisfy all
     properties of a distance metric are also used in practice, e.g., KL
     divergence.
