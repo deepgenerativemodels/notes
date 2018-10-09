@@ -9,9 +9,9 @@ Since these notes are brand new, you will find several typos. If you do, please 
 You too may help make these notes better by submitting your improvements to us via [Github](https://github.com/deepgenerativemodels/notes).
 
 
-1. [Introduction](assets/files/introduction/)
+1. [Introduction](introduction/)
 
-2. [Autoregressive Models](assets/files/autoregressive/)
+2. [Autoregressive Models](autoregressive/)
 
 3. [Variational Autoencoders] Coming soon!
 
