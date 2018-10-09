@@ -33,9 +33,13 @@ In the parametric setting, we can think of the task of learning a
 generative model as picking the parameters within a family of model
 distributions that minimizes some notion of distance[^1] between the
 model distribution and the data distribution.
+ 
+<img src="learning_1.png" alt="drawing" width="200" class="center"/>
 
-![given](learning_1.png)
-![goal](learning_2.png)
+
+<img src="learning_2.png" alt="drawing" width="300" class="center"/>
+<!-- ![given](learning_1.png =100x20)
+![goal](learning_2.png =100x20) -->
 
 
 For instance, we might be given access to a dataset of dog images $$\mathcal{D}$$ and

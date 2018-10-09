@@ -17,10 +17,18 @@ p(\mathbf{x}) = \prod\limits_{i=1}^{n}p(x_i \vert x_1, x_2, \ldots, x_{i-1}) =
 
 where $$\mathbf{x}_{< i}=[x_1, x_2, \ldots, x_{i-1}]$$ denotes the vector of random variables with index less than $$i$$. 
 
-The chain rule factorization can be expressed graphically as a Bayesian network with no conditional independencies:
+The chain rule factorization can be expressed graphically as a Bayesian network:
 
-![autoregressive](autoregressive.png)
 
+<figure>
+<img src="autoregressive.png" alt="drawing" width="400" class="center"/>
+<figcaption>
+Graphical model for an autoregressive Bayesian network with no conditional independence assumptions.
+ </figcaption>
+</figure>
+
+Such a Bayesian network that makes no conditional independence assumptions is said to obey the *autoregressive* property.
+The term *autoregressive* originates from the literature on time-series models where observations from the previous time-steps are used to predict the value at the current time step. Here, we fix an ordering of the variables $$x_1, x_2, \ldots, x_n$$ and the distribution for the $$i$$-th random variable depends on the values of all the preceeding random variables in the chosen ordering $$x_1, x_2, \ldots, x_{i-1}$$.
 
 If we allow for every conditional $$p(x_i \vert \mathbf{x}_{< i})$$ to be specified in a tabular form, then such a representation is fully general and can represent any possible distribution over $$n$$ random variables. However, the space complexity for such a representation grows exponentially with $$n$$.
 
@@ -34,13 +42,15 @@ p_{\theta_i}(x_i \vert \mathbf{x}_{< i}) = \mathrm{Bern}(f_i(x_1, x_2, \ldots, x
 where $$\theta_i$$ denotes the set of parameters used to specify the mean
 function $$f_i: \{0,1\}^{i-1}\rightarrow [0,1]$$. 
 
-The term *autoregressive* originates from the literature on time-series models where observations from the previous time-steps are used to predict the value at the current time step. Here, we are predicting the distribution for the $$i$$-th random variable using the values of the preceeding random variables in the sequence $$x_1, x_2, \ldots, x_n$$.
 
 The number of parameters of an autoregressive generative model are given by $$\sum_{i=1}^n \vert \theta_i \vert$$. As we shall see in the examples below, the number of parameters are much fewer than the tabular setting considered previously. Unlike the tabular setting however, an autoregressive generative model cannot represent all possible distributions. Its expressiveness is limited by the fact that we are limiting the conditional distributions to correspond to a Bernoulli random variable with a restricted class of parameterized functions specifying the mean.
 
-
-![fvsbn](fvsbn.png)
-
+<figure>
+<img src="fvsbn.png" alt="drawing" width="200" class="center"/>
+<figcaption>
+ A fully visible sigmoid belief network over four variables. The conditionals are denoted by \(\widehat{x}_1, \widehat{x}_2, \widehat{x}_3, \widehat{x}_4\) respectively.
+ </figcaption>
+</figure>
 In the simplest case, we can specify the function as a linear combination of the input elements followed by a sigmoid non-linearity (to restrict the output to lie between 0 and 1). This gives us the formulation of a *fully-visible sigmoid belief network* (FVSBN):
 
 {% math %}
@@ -60,7 +70,12 @@ where $$\mathbf{h}_i \in \mathbb{R}^d$$ denotes the hidden layer activations for
 are the set of parameters for the mean function $$\mu_i(\cdot)$$. The total number of parameters in this model is dominated by the matrices $$A_i$$ and given by $$O(n^2 d)$$.
 
 
-![nade](nade.png)
+<figure>
+<img src="nade.png" alt="drawing" width="200" class="center"/>
+<figcaption>
+ A neural autoregressive density estimator over four variables. The conditionals are denoted by \(\widehat{x}_1, \widehat{x}_2, \widehat{x}_3, \widehat{x}_4\) respectively. The blue connections denote the tied weights \(W[., i\) used for computing the hidden layer activations.
+ </figcaption>
+</figure>
 
 The Neural Autoregressive Density Estimation (NADE) provides an efficient MLP parameterization that shares parameters used for evaluating the hidden layer activations.
 
@@ -132,7 +147,7 @@ Inference in an autoregressive model is straightforward. For density estimation 
 
 Sampling from an autoregressive model is a sequential procedure. Here, we first sample $$x_1$$, then we sample $$x_2$$ conditioned on the sampled $$x_1$$, followed by $$x_3$$ conditioned on both $$x_1$$ and $$x_2$$ and so on until we sample $$x_n$$ conditioned on the previously sampled $$\mathbf{x}_{< n}$$. For applications requiring real-time generation of high-dimensional data such as audio synthesis, the sequential sampling can be an expensive process.
 
-TODO: add NADE samples figure
+<!-- TODO: add NADE samples figure -->
 
 Finally, an autoregressive model does not directly learn unsupervised representations of the data. In the next few set of lectures, we will look at latent variable models (e.g., variational autoencoders) which explicitly learn latent representations of the data.
 
