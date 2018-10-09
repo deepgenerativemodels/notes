@@ -51,15 +51,15 @@ The number of parameters of an autoregressive generative model are given by $$\s
  A fully visible sigmoid belief network over four variables. The conditionals are denoted by \(\widehat{x}_1, \widehat{x}_2, \widehat{x}_3, \widehat{x}_4\) respectively.
  </figcaption>
 </figure>
-In the simplest case, we can specify the function as a linear combination of the input elements followed by a sigmoid non-linearity (to restrict the output to lie between 0 and 1). This gives us the formulation of a *fully-visible sigmoid belief network* (FVSBN):
+In the simplest case, we can specify the function as a linear combination of the input elements followed by a sigmoid non-linearity (to restrict the output to lie between 0 and 1). This gives us the formulation of a *fully-visible sigmoid belief network* ([FVSBN](https://papers.nips.cc/paper/1153-does-the-wake-sleep-algorithm-produce-good-density-estimators.pdf)):
 
 {% math %}
 f_i(x_1, x_2, \ldots, x_{i-1}) =\sigma(\alpha^{(i)}_0 + \alpha^{(i)}_1 x_1 + \ldots + \alpha^{(i)}_{i-1} x_{i-1})
 {% endmath %} 
 
-where $$\sigma$$ denotes the sigmoid function and $$\theta_i=\{\alpha^{(i)}_0,\alpha^{(i)}_1, \ldots, \alpha^{(i)}_{i-1}\}$$ denote the parameters of the mean function. The conditional for variable $$i$$ requires $$i$$ parameters, and hence the total number of parameters in the model is given by $$\sum_{i=1}^ni= O(n^2)$$. Note that the number of parameters are much fewer than the exponential parameters required in the tabular case.
+where $$\sigma$$ denotes the sigmoid function and $$\theta_i=\{\alpha^{(i)}_0,\alpha^{(i)}_1, \ldots, \alpha^{(i)}_{i-1}\}$$ denote the parameters of the mean function. The conditional for variable $$i$$ requires $$i$$ parameters, and hence the total number of parameters in the model is given by $$\sum_{i=1}^ni= O(n^2)$$. Note that the number of parameters are much fewer than the exponential complexity of the tabular case.
 
-A natural way to increase the expressiveness of an autoregressive generative model is to use more flexible parameterizations for the mean function e.g., multi-layer perceptrons (MLP). In the case of 1-hidden layer neural networks, the mean function for variable $$i$$ can be expressed as:
+A natural way to increase the expressiveness of an autoregressive generative model is to use more flexible parameterizations for the mean function e.g., multi-layer perceptrons (MLP). For example, consider the case of a neural network with 1 hidden layer. The mean function for variable $$i$$ can be expressed as:
 
 {% math %}
 \mathbf{h}_i = \sigma(A_i \mathbf{x_{< i}} + \mathbf{c}_i)\\
@@ -77,7 +77,7 @@ are the set of parameters for the mean function $$\mu_i(\cdot)$$. The total numb
  </figcaption>
 </figure>
 
-The Neural Autoregressive Density Estimation (NADE) provides an efficient MLP parameterization that shares parameters used for evaluating the hidden layer activations.
+The *Neural Autoregressive Density Estimator* ([NADE](http://proceedings.mlr.press/v15/larochelle11a/larochelle11a.pdf)) provides an alternate MLP-based parameterization that is more statistically and computationally efficient than the vanilla approach. In NADE, parameters are shared across the functions used for evaluating the conditionals. In particular, the hidden layer activations are specified as:
 
 {% math %}
 \mathbf{h}_i = \sigma(W_{., < i} \mathbf{x_{< i}} + \mathbf{c})\\
@@ -86,7 +86,7 @@ f_i(x_1, x_2, \ldots, x_{i-1}) =\sigma(\boldsymbol{\alpha}^{(i)}\mathbf{h}_i +b_
 where $$\theta=\{W\in \mathbb{R}^{d\times n}, \mathbf{c} \in \mathbb{R}^d, \{\boldsymbol{\alpha}^{(i)}\in \mathbb{R}^d\}^n_{i=1}, \{b_i \in \mathbb{R}\}^n_{i=1}\}$$is
 the full set of parameters for the mean functions $$f_1(\cdot), f_2(\cdot), \ldots, f_n(\cdot)$$. The weight matrix $$W$$ and the bias vector $$\mathbf{c}$$ are shared across the conditionals. Sharing parameters offers two benefits:
 
-1.  The total number of parameters from $$O(n^2 d)$$ to $$O(nd)$$ \[readers are encouraged to check!\].
+1.  The total number of parameters gets reduced from $$O(n^2 d)$$ to $$O(nd)$$ \[readers are encouraged to check!\].
 
 2.  The hidden unit activations can be evaluated in $$O(nd)$$ time via the following recursive strategy:
     {% math %}
@@ -132,7 +132,7 @@ In practice, we optimize the MLE objective using mini-batch gradient ascent. The
 
 where $$\theta^{(t+1)}$$ and $$\theta^{(t)}$$ are the parameters at iterations $$t+1$$ and $$t$$ respectively, and $$r_t$$ is the learning rate at iteration $$t$$. Typically, we only specify the initial learning rate $$r_1$$ and update the rate based on a schedule. [Variants](http://cs231n.github.io/optimization-1/) of stochastic gradient ascent, such as RMS prop and Adam, employ modified update rules that work slightly better in practice.
 
-From a practical standpoint, we must think about how to choose hyperaparameters (such as the initial learning rate) and a stopping criteria for the gradient descent. For both these questions, we follow the standard practice in machine learning of monitoring the objective on a validation dataset. Consequently, we choose the hyperparameters with the best performance on the validation dataset and stop updating the parameters when the validation log-likelihoods stop improving.
+From a practical standpoint, we must think about how to choose hyperaparameters (such as the initial learning rate) and a stopping criteria for the gradient descent. For both these questions, we follow the standard practice in machine learning of monitoring the objective on a validation dataset. Consequently, we choose the hyperparameters with the best performance on the validation dataset and stop updating the parameters when the validation log-likelihoods cease to improve[^1].
 
 Now that we have a well-defined objective and optimization procedure, the only remaining task is to evaluate the objective in the context of an autoregressive generative model. To this end, we substitute the factorized joint distribution of an autoregressive model in the MLE objective to get:
 
@@ -145,7 +145,7 @@ collective set of parameters for the conditionals.
 
 Inference in an autoregressive model is straightforward. For density estimation of an arbitrary point $$\mathbf{x}$$, we simply evaluate the log-conditionals $$\log p_{\theta_i}(x_i \vert \mathbf{x}_{< i})$$ for each $$i$$ and add these up to obtain the log-likelihood assigned by the model to $$\mathbf{x}$$. Since we know conditioning vector $$\mathbf{x}$$, each of the conditionals can be evaluated in parallel. Hence, density estimation is efficient on modern hardware.
 
-Sampling from an autoregressive model is a sequential procedure. Here, we first sample $$x_1$$, then we sample $$x_2$$ conditioned on the sampled $$x_1$$, followed by $$x_3$$ conditioned on both $$x_1$$ and $$x_2$$ and so on until we sample $$x_n$$ conditioned on the previously sampled $$\mathbf{x}_{< n}$$. For applications requiring real-time generation of high-dimensional data such as audio synthesis, the sequential sampling can be an expensive process.
+Sampling from an autoregressive model is a sequential procedure. Here, we first sample $$x_1$$, then we sample $$x_2$$ conditioned on the sampled $$x_1$$, followed by $$x_3$$ conditioned on both $$x_1$$ and $$x_2$$ and so on until we sample $$x_n$$ conditioned on the previously sampled $$\mathbf{x}_{< n}$$. For applications requiring real-time generation of high-dimensional data such as audio synthesis, the sequential sampling can be an expensive process. Later in this course, we will discuss how parallel Wavenet, an autoregressive model sidesteps this expensive sampling process.
 
 <!-- TODO: add NADE samples figure -->
 
@@ -159,9 +159,14 @@ Additional parameterizations
 
 ###  NADE++
 
-The RNADE algorithm extends NADE to learn generative models over real-valued data. Here, the conditionals are modeled via a continuous distribution such as a equi-weighted mixture of $$K$$ Gaussians. Instead of learning a mean function, we know learn the means $$\mu_{i,1}, \mu_{i,2},\ldots, \mu_{i,K}$$ and variances $$\Sigma_{i,1}, \Sigma_{i,2},\ldots, \Sigma_{i,K}$$ of the $$K$$ Gaussians for every conditional. For statistical and computational efficiency, a single function $$g_i: \mathbb{R}^{i-1}\rightarrow\mathbb{R}^{2K}$$ outputs all the means and variances of the $$K$$ Gaussians for the $$i$$-th conditional distribution.
+The [RNADE](https://arxiv.org/abs/1306.0186) algorithm extends NADE to learn generative models over real-valued data. Here, the conditionals are modeled via a continuous distribution such as a equi-weighted mixture of $$K$$ Gaussians. Instead of learning a mean function, we know learn the means $$\mu_{i,1}, \mu_{i,2},\ldots, \mu_{i,K}$$ and variances $$\Sigma_{i,1}, \Sigma_{i,2},\ldots, \Sigma_{i,K}$$ of the $$K$$ Gaussians for every conditional. For statistical and computational efficiency, a single function $$g_i: \mathbb{R}^{i-1}\rightarrow\mathbb{R}^{2K}$$ outputs all the means and variances of the $$K$$ Gaussians for the $$i$$-th conditional distribution.
 
-Notice that NADE requires specifying a single, fixed ordering of the variables. The choice of ordering can lead to different models. The EoNADE extension allows training an ensemble of NADE models with different orderings.
+Notice that NADE requires specifying a single, fixed ordering of the variables. The choice of ordering can lead to different models. The [EoNADE](https://arxiv.org/abs/1310.1757) algorithm allows training an ensemble of NADE models with different orderings.
 
 
 Coming soon: MADE, Char-RNN, Pixel-CNN, Wavenet
+
+Footnotes
+==============
+
+[^1]: Given the non-convex nature of such problems, the optimization procedure can get stuck in local optima. Hence, early stopping will generally not be optimal but is a very practical strategy.
