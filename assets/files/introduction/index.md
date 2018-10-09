@@ -34,7 +34,8 @@ generative model as picking the parameters within a family of model
 distributions that minimizes some notion of distance[^1] between the
 model distribution and the data distribution.
 
-![learning](learning.png)
+![given](learning_1.png)
+![goal](learning_2.png)
 
 
 For instance, we might be given access to a dataset of dog images $$\mathcal{D}$$ and

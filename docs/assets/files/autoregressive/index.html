@@ -89,7 +89,13 @@ p(\mathbf{x}) = \prod\limits_{i=1}^{n}p(x_i \vert x_1, x_2, \ldots, x_{i-1}) =
 </script></div>
 
 <p>where <script type="math/tex">% <![CDATA[
-\mathbf{x}_{< i}=[x_1, x_2, \ldots, x_{i-1}] %]]></script> denotes the vector of random variables with index less than <script type="math/tex">i</script>. If we allow for every conditional <script type="math/tex">% <![CDATA[
+\mathbf{x}_{< i}=[x_1, x_2, \ldots, x_{i-1}] %]]></script> denotes the vector of random variables with index less than <script type="math/tex">i</script>.</p>
+
+<p>The chain rule factorization can be expressed graphically as a Bayesian network with no conditional independencies:</p>
+
+<p><img src="autoregressive.png" alt="autoregressive" /></p>
+
+<p>If we allow for every conditional <script type="math/tex">% <![CDATA[
 p(x_i \vert \mathbf{x}_{< i}) %]]></script> to be specified in a tabular form, then such a representation is fully general and can represent any possible distribution over <script type="math/tex">n</script> random variables. However, the space complexity for such a representation grows exponentially with <script type="math/tex">n</script>.</p>
 
 <p>To see why, let us consider the conditional for the last dimension, given by <script type="math/tex">% <![CDATA[
@@ -108,6 +114,8 @@ function <script type="math/tex">f_i: \{0,1\}^{i-1}\rightarrow [0,1]</script>.</
 
 <p>The number of parameters of an autoregressive generative model are given by <script type="math/tex">\sum_{i=1}^n \vert \theta_i \vert</script>. As we shall see in the examples below, the number of parameters are much fewer than the tabular setting considered previously. Unlike the tabular setting however, an autoregressive generative model cannot represent all possible distributions. Its expressiveness is limited by the fact that we are limiting the conditional distributions to correspond to a Bernoulli random variable with a restricted class of parameterized functions specifying the mean.</p>
 
+<p><img src="fvsbn.png" alt="fvsbn" /></p>
+
 <p>In the simplest case, we can specify the function as a linear combination of the input elements followed by a sigmoid non-linearity (to restrict the output to lie between 0 and 1). This gives us the formulation of a <em>fully-visible sigmoid belief network</em> (FVSBN):</p>
 
 <div class="mathblock"><script type="math/tex; mode=display">
@@ -125,6 +133,8 @@ f_i(x_1, x_2, \ldots, x_{i-1}) =\sigma(\boldsymbol{\alpha}^{(i)}\mathbf{h}_i +b_
 
 <p>where <script type="math/tex">\mathbf{h}_i \in \mathbb{R}^d</script> denotes the hidden layer activations for the MLP and <script type="math/tex">\theta_i = \{A_i \in \mathbb{R}^{d\times (i-1)},  \mathbf{c}_i \in \mathbb{R}^d, \boldsymbol{\alpha}^{(i)}\in \mathbb{R}^d, b_i \in \mathbb{R}\}</script>
 are the set of parameters for the mean function <script type="math/tex">\mu_i(\cdot)</script>. The total number of parameters in this model is dominated by the matrices <script type="math/tex">A_i</script> and given by <script type="math/tex">O(n^2 d)</script>.</p>
+
+<p><img src="nade.png" alt="nade" /></p>
 
 <p>The Neural Autoregressive Density Estimation (NADE) provides an efficient MLP parameterization that shares parameters used for evaluating the hidden layer activations.</p>
 
