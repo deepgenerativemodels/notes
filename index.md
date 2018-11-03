@@ -17,6 +17,6 @@ You too may help make these notes better by submitting your improvements to us v
 
 4. [Normalizing Flow Models] Coming soon!
 
-5. [Generative Adversarial Networks] Coming soon!
+5. [Generative Adversarial Networks](gans/)
 
 6. [Energy-based models] Coming soon!
