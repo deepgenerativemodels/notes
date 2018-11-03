@@ -13,7 +13,7 @@ You too may help make these notes better by submitting your improvements to us v
 
 2. [Autoregressive Models](autoregressive/)
 
-3. [Variational Autoencoders] Coming soon!
+3. [Variational Autoencoders](vae/) <!-- Coming soon! -->
 
 4. [Normalizing Flow Models] Coming soon!
 
