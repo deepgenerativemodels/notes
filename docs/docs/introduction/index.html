@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Introduction</title>
+  <meta name="description" content="Lecture notes for Deep Generative Models.">
+
+
+  <link rel="stylesheet" href="/notes/css/tufte.css">	
+  
+
+  <!-- Google Fonts loaded here depending on setting in _data/options.yml true loads font, blank does not-->
+  
+    <link href='//fonts.googleapis.com/css?family=Lato:400,400italic' rel='stylesheet' type='text/css'>
+  
+  <!-- Load up MathJax script if needed ... specify in /_data/options.yml file-->
+  
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-75587219-1', 'auto');
+  ga('send', 'pageview');
+
+  </script>
+
+  <link rel="canonical" href="http://localhost:4000/notes/introduction/">
+  <link rel="alternate" type="application/rss+xml" title="Deep Generative Models" href="http://localhost:4000/notes/feed.xml" />
+</head>
+
+  <body>
+    <!--- Header and nav template site-wide -->
+<header>
+    <nav class="group">
+        <a href="/notes/">Contents</a>
+	<a href="http://deepgenerativemodels.github.io">Class</a>
+	<a href="http://github.com/deepgenerativemodels/notes">Github</a>
+	</nav>
+</header>
+
+    <article class="group">
+      <h1>Introduction</h1>
+<p class="subtitle"></p>
+
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    TeX: {
+      Macros: {
+        e: "\\epsilon",
+        xti: "x^{(i)}",
+        yti: "y^{(i)}",
+        bfy: "{\\bf y}",
+        bfx: "{\\bf x}",
+        bfg: "{\\bf g}",
+        bfbeta: "{\\bf \\beta}",
+        tp: "\\tilde p",
+        pt: "p_\\theta",
+        Exp: "{\\mathbb{E}}",
+        Ind: "{\\mathbb{I}}",
+        KL: "{\\mathbb{KL}}",
+        Dc: "{\\mathcal{D}}",
+        Tc: "{\\mathcal{T}}",
+        Xc: "{\\mathcal{X}}",
+        note: ["\\textcolor{blue}{[NOTE: #1]}",1]
+      }
+    }
+  });
+</script>
+
+
+<p>Intelligent agents are constantly generating, acquiring, and processing
+data. This data could be in the form of <em>images</em> that we capture on our
+phones, <em>text</em> messages we share with our friends, <em>graphs</em> that model
+interactions on social media, <em>videos</em> that record important events,
+etc. Natural agents excel at discovering patterns, extracting
+knowledge, and performing complex reasoning based on the data they observe. How
+can we build artificial learning systems to do the same?</p>
+
+<p>In this course, we will study generative models that view the world under the lens of probability.
+In such a worldview, we can think of any kind of
+observed data, say <script type="math/tex">\mathcal{D}</script>, as a finite set of samples from an
+underlying distribution, say <script type="math/tex">p_{\mathrm{data}}</script>. At its very core, the
+goal of any generative model is then to approximate this data
+distribution given access to the dataset <script type="math/tex">\mathcal{D}</script>. The hope is that
+if we are able to <em>learn</em> a good generative model, we can use the
+learned model for downstream <em>inference</em>.</p>
+
+<h2 id="learning">Learning</h2>
+
+<p>We will be primarily interested in parametric approximations to the data
+distribution, which summarize all the information about the dataset <script type="math/tex">\mathcal{D}</script> in
+a finite set of parameters. In contrast with non-parametric models,
+parametric models scale more efficiently with large datasets but are
+limited in the family of distributions they can represent.</p>
+
+<p>In the parametric setting, we can think of the task of learning a
+generative model as picking the parameters within a family of model
+distributions that minimizes some notion of distance<sup id="fnref:1"><a href="#fn:1" class="footnote">1</a></sup> between the
+model distribution and the data distribution.</p>
+
+<p><img src="learning_1.png" alt="drawing" width="200" class="center" /></p>
+
+<p><img src="learning_2.png" alt="drawing" width="300" class="center" />
+<!-- ![given](learning_1.png =100x20)
+![goal](learning_2.png =100x20) --></p>
+
+<p>For instance, we might be given access to a dataset of dog images <script type="math/tex">\mathcal{D}</script> and
+our goal is to learn the paraemeters of  a generative model <script type="math/tex">\theta</script> within a model family <script type="math/tex">\mathcal{M}</script> such that
+the model distribution <script type="math/tex">p_\theta</script> is close to the data distribution over dogs
+<script type="math/tex">p_{\mathrm{data}}</script>. Mathematically, we can specify our goal as the
+following optimization problem: <script type="math/tex"></script>\begin{equation}
+\min_{\theta\in \mathcal{M}}d(p_{\mathrm{data}}, p_{\theta})
+\label{eq:learning_gm}
+\tag{1}
+\end{equation}<script type="math/tex"></script>where <script type="math/tex">p_{\mathrm{data}}</script> is accessed via the dataset
+<script type="math/tex">\mathcal{D}</script> and <script type="math/tex">d(\cdot)</script> is a notion of distance between probability distributions.</p>
+
+<p>As we navigate through this course, it is interesting to take note of
+the difficulty of the problem at hand. A typical image from a modern
+phone camera has a resolution of approximately <script type="math/tex">700 \times 1400</script> pixels.
+Each pixel has three channels: R(ed), G(reen) and B(lue) and each
+channel can take a value between 0 to 255. Hence, the number of possible
+images is given by <script type="math/tex">256^{700 \times 1400 \times 3}\approx 10 ^{800000}</script>.
+In contrast, Imagenet, one of the largest publicly available datasets,
+consists of only about 15 million images. Hence, learning a generative
+model with such a limited dataset is a highly underdetermined problem.</p>
+
+<p>Fortunately, the real world is highly structured and automatically
+discovering the underlying structure is key to learning generative
+models. For example, we can hope to learn some basic artifacts about
+dogs even with just a few images: two eyes, two ears, fur etc. Instead
+of incorporating this prior knowledge explicitly, we will hope the model
+learns the underlying structure directly from data. There is no free
+lunch however, and indeed successful learning of generative models will
+involve instantiating the optimization problem in
+<script type="math/tex">(\ref{eq:learning_gm})</script> in a suitable way. In this course, we will be
+primarily interested in the following questions:</p>
+
+<ul>
+  <li>What is the representation for the model family <script type="math/tex">\mathcal{M}</script>?</li>
+  <li>What is the objective function <script type="math/tex">d(\cdot)</script>?</li>
+  <li>What is the optimization procedure for minimizing <script type="math/tex">d(\cdot)</script>?</li>
+</ul>
+
+<p>In the next few set of lectures, we will take a deeper dive into certain
+families of generative models. For each model family, we will note how
+the representation is closely tied with the choice of learning objective
+and the optimization procedure.</p>
+
+<h2 id="inference">Inference</h2>
+
+<p>For a discriminative model such as logistic regression, the fundamental
+inference task is to predict a label for any given datapoint. Generative
+models, on the other hand, learn a joint distribution over the entire
+data.<sup id="fnref:2"><a href="#fn:2" class="footnote">2</a></sup></p>
+
+<p>While the range of applications to which generative models have been
+used continue to grow, we can identify three fundamental inference
+queries for evaluating a generative model.:</p>
+
+<ol>
+  <li>
+    <p><em>Density estimation:</em> Given a datapoint <script type="math/tex">\mathbf{x}</script>, what is the
+probability assigned by the model, i.e., <script type="math/tex">p_\theta(\mathbf{x})</script>?</p>
+  </li>
+  <li>
+    <p><em>Sampling:</em> How can we <em>generate</em> novel data from the model
+distribution, i.e.,
+<script type="math/tex">\mathbf{x}_{\mathrm{new}} \sim p_\theta(\mathbf{x})</script>?</p>
+  </li>
+  <li>
+    <p><em>Unsupervised representation learning:</em> How can we learn meaningful
+feature representations for a datapoint <script type="math/tex">\mathbf{x}</script>?</p>
+  </li>
+</ol>
+
+<p>Going back to our example of learning a generative model over dog
+images, we can intuitively expect a good generative model to work as
+follows. For density estimation, we expect <script type="math/tex">p_\theta(\mathbf{x})</script> to be
+high for dog images and low otherwise. Alluding to the name <em>generative
+model</em>, sampling involves generating novel images of dogs beyond the
+ones we observe in our dataset. Finally, representation learning can
+help discover high-level structure in the data such as the breed of
+dogs.</p>
+
+<p>In light of the above inference tasks, we note two caveats. First,
+quantitative evaluation of generative models on these tasks is itself
+non-trivial (in particular, sampling and representation learning) and an
+area of active research. Some quantitative metrics exist, but these
+metrics often fail to reflect desirable qualitative attributes in the
+generated samples and the learned representations. Secondly, not all
+model families permit efficient and accurate inference on all these
+tasks. Indeed, the trade-offs in the inference capabilities of the
+current generative models have led to the development of very diverse approaches as
+we shall see in this course.</p>
+
+<h2 id="footnotes">Footnotes</h2>
+
+<div class="footnotes">
+  <ol>
+    <li id="fn:1">
+      <p>As we shall see later, functions that do not satisfy all
+properties of a distance metric are also used in practice, e.g., KL
+divergence. <a href="#fnref:1" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:2">
+      <p>Technically, a probabilistic discriminative model is also a
+generative model of the labels conditioned on the data. However, the
+usage of the term generative models is typically reserved for high
+dimensional data. <a href="#fnref:2" class="reversefootnote">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
+
+
+
+    </article>
+    <span class="print-footer">Introduction - Aditya Grover</span>
+    <footer>
+  <hr class="slender">
+  <!-- <ul class="footer&#45;links"> -->
+  <!--   <li><a href="mailto:hate@spam.net"><span class="icon&#45;mail"></span></a></li>     -->
+  <!--    -->
+  <!--     <li> -->
+  <!--       <a href="//www.twitter.com/twitter_handle"><span class="icon-twitter"></span></a> -->
+  <!--     </li> -->
+  <!--    -->
+  <!--     <li> -->
+  <!--       <a href="//plus.google.com/+googlePlusName"><span class="icon-googleplus"></span></a> -->
+  <!--     </li> -->
+  <!--    -->
+  <!--     <li> -->
+  <!--       <a href="//github.com/GithubHandle"><span class="icon-github"></span></a> -->
+  <!--     </li> -->
+  <!--    -->
+  <!--     <li> -->
+  <!--       <a href="//www.flickr.com/photos/FlickrUserID"><span class="icon-flickr"></span></a> -->
+  <!--     </li> -->
+  <!--    -->
+  <!--     <li> -->
+  <!--       <a href="/feed"><span class="icon-feed"></span></a> -->
+  <!--     </li> -->
+  <!--      -->
+  <!-- </ul> -->
+<div class="credits">
+<!-- <span>&#38;copy; 2018 <!&#45;&#45; &#38;#38;nbsp;&#38;#38;nbsp;ADITYA GROVER &#45;&#45;></span></br> <br> -->
+<span>Site created with <a href="//jekyllrb.com">Jekyll</a> using the <a href="//github.com/clayh53/tufte-jekyll">Tufte theme</a>. &copy; 2018</span> 
+</div>  
+</footer>
+
+  </body>
+</html>
