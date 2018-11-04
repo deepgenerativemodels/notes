@@ -28,22 +28,37 @@ title: Variational Autoencoders
 \DeclareMathOperator*{\argmax}{arg\,max}
 {% endmath %}
 
-The goal of this post is to provide a look at some of the core mathematical principles of the variational autoencoder. We shall do so by developing the variational autoencoder "from scratch", starting with a latent variable model and culminating with the use of deep neural networks to train the generative model with a variational procedure.
 
-We begin by considering a directed latent variable model of the following form
+Latent variable models form a rich class of probabilistic models that can infer hidden structure in the underlying data. In this post, we will study variational autoencoders, which are a powerful class of deep generative models with latent variables.
+
+Representation
+==============
+
+Consider a directed, latent variable model as shown below.
+
+<figure>
+<img src="vae.png" alt="drawing" width="100" class="center"/>
+<figcaption>
+Graphical model for a directed, latent variable model.
+ </figcaption>
+</figure>
+
+In the model above, $$\bz$$ and $$\bx$$ denote the latent and observed variables respectively. The joint distribution expressed by this model is given as
 {% math %}
-p(\bx, \bz) = p(\bx \giv \bz)p(\bz),
+p_\theta(\bx, \bz) = p(\bx \giv \bz)p(\bz).
 {% endmath %}
-where $$\bz$$ is the latent variable and $$\bx$$ is the observed variable. This model describes a generative process that samples $$\bx$$ using the procedure
+
+From a generative modeling perspective, this model describes a generative process for the observed data $$\bx$$ using the following procedure
 {% math %}
 \begin{align}
 \bz &\sim p(\bz) \\
 \bx &\sim p(\bx \giv \bz).
 \end{align}
 {% endmath %}
-As such, we shall call this our generative model. If one adopts the belief that the latent variable $$\bz$$ somehow encodes semantically meaningful information about $$\bx$$, it is natural to view this generative process as first generating the "high-level" semantic information about $$\bx$$ first before fully generating $$\bx$$. Such a perspective motivates generative models with rich latent variable structures such as hierarchical generative models $$p(\bx, \bz_1, \ldots, \bz_m) = p(\bx \giv \bz_1)\prod_i p(\bz_i \giv \bz_{i+1})$$---where information about $$\bx$$ is generated hierarchically---and temporal models such as the Hidden Markov Model---where temporally-related high-level information is generated first before constructing $$\bx$$.
 
-We now consider a family of distributions $$\P_\bz$$ where $$p(\bz) \in \P_\bz$$ describes a probability distribution over $$\bz$$. Next, consider a family of conditional distributions $$\P_{\bx\giv \bz}$$ where $$p(\bx \giv \bz) \in \P_{\bx\giv \bz}$$ describes a conditional probability distribution over $$\bx$$ given $$\bz$$. Then our hypothesis class of generative models is the set of all possible combinations
+If one adopts the belief that the latent variables $$\bz$$ somehow encode semantically meaningful information about $$\bx$$, it is natural to view this generative process as first generating the "high-level" semantic information about $$\bx$$ first before fully generating $$\bx$$. Such a perspective motivates generative models with rich latent variable structures such as hierarchical generative models $$p(\bx, \bz_1, \ldots, \bz_m) = p(\bx \giv \bz_1)\prod_i p(\bz_i \giv \bz_{i+1})$$---where information about $$\bx$$ is generated hierarchically---and temporal models such as the Hidden Markov Model---where temporally-related high-level information is generated first before constructing $$\bx$$.
+
+We now consider a family of distributions $$\P_\bz$$ where $$p(\bz) \in \P_\bz$$ describes a probability distribution over $$\bz$$. Next, consider a family of conditional distributions $$\P_{\bx\giv \bz}$$ where $$p_\theta(\bx \giv \bz) \in \P_{\bx\giv \bz}$$ describes a conditional probability distribution over $$\bx$$ given $$\bz$$. Then our hypothesis class of generative models is the set of all possible combinations
 {% math %}
 \begin{align}
 \P_{\bx,\bz} = \set{p(\bx, \bz) \giv p(\bz) \in \P_\bz, p(\bx \giv \bz) \in \P_{\bx\giv\bz}}.
@@ -51,47 +66,89 @@ We now consider a family of distributions $$\P_\bz$$ where $$p(\bz) \in \P_\bz$$
 {% endmath %}
 Given a dataset $$\D = \set{\bx^{(1)}, \ldots, \bx^{(n)}}$$, we are interested in the following learning and inference tasks
 - Selecting $$p \in \P_{\bx,\bz}$$ that "best" fits $$\D$$.
-- Approximate inference of $$\bz$$: given a sample $$\bx$$, how do we impute its latent variable $$\bz$$?
+- Given a sample $$\bx$$ and a model $$p \in \P_{\bx,\bz}$$, what is the posterior distribution over the latent variables $$\bz$$?
 <!-- - Approximate marginal inference of $$\bx$$: given partial access to certain dimensions of the vector $$\bx$$, how do we impute the missing parts? -->
 
-We shall also assume the following
+<!-- We shall also assume the following
 - Intractability: computing the posterior probability $$p(\bz \giv \bx)$$ is intractable.
-- Big data: the dataset $$\D$$ is too large to fit in memory; we can only work with small, sub-sampled batches of $$\D$$.
+- Big data: the dataset $$\D$$ is too large to fit in memory; we can only work with small, sub-sampled batches of $$\D$$. -->
 
 Learning Directed Latent Variable Models
 ==============
 
-One way to measure how closely $$p(\bx, \bz)$$ fits the data $$\D$$ is to measure the Kullback-Leibler (KL) divergence between the data distribution (which we denote as $$p_\D(\bx)$$) and the model's marginal distribution $$p(\bx) = \int p(\bx, \bz) \d \bz$$,
+One way to measure how closely $$p(\bx, \bz)$$ fits the observed dataset $$\D$$ is to measure the Kullback-Leibler (KL) divergence between the data distribution (which we denote as $$p_{\mathrm{data}}(\bx)$$) and the model's marginal distribution $$p(\bx) = \int p(\bx, \bz) \d \bz$$. The distribution that ``best'' fits the data is thus obtained by minimizing the KL divergence. 
+
 {% math %}
 \begin{align}
-\KL{p_\D(\bx)}{p(\bx)}.
+\min_{p \in \P_{\bx, \bz}}\KL{p_{\mathrm{data}}(\bx)}{p(\bx)}.
 \end{align}
 {% endmath %}
-The distribution that ``best'' fits is thus $$p \in \P_{\bx, \bz}$$ that minimizes the KL divergence. Equivalently, we wish to solve the maximum marginal log-likelihood problem
+
+As we have seen previously, optimizing an empirical estimate of the KL divergence is equivalent to maximizing the marginal log-likelihood $$\log p(\bz)$$ over $$\D$$
 {% math %}
 \begin{align}
-\max_{p \in \P_{\bx, \bz}} \sum_{\bx \in \D} \log \int p(\bx, \bz) \d \bz.
+\max_{p \in \P_{\bx, \bz}} \sum_{\bx \in \D} \log p(\bx) = \sum_{\bx \in \D} \int p(\bx, \bz) \d \bz.
 \end{align}
 {% endmath %}
-However, this problem is intractable due to the difficulty of marginalizing the latent variable---which is as difficult as computing the posterior $$p(\bz \mid \bx)$$. Rather than maximizing the log-likelihood directly, we instead construct a lower bound that is more amenable to optimization. To do so, we introduce a variational family $$\Q$$ and note that the following relationships hold true[^1] for all proposal distributions $$q(\bz) \in \Q$$
+
+However, it turns out this problem is generally intractable for high-dimensional $$\bz$$ as it involves an integration (or sums in the case $$\bz$$ is discrete) over all the possible latent sources of variation $$\bz$$. One option is to estimate the objective via Monte Carlo. For any given datapoint $$\bf x$$, we can obtain the following estimate for its marginal log-likelihood
+
+{% math %}
+\log p(\bx) \approx \frac{1}{k} \sum_{i=1}^k \log p(\bx \vert \bz^{(i)})
+{% endmath %}
+
+In practice however, the above estimate however has high variance and is not optimized in practice. 
+
+
+Rather than maximizing the log-likelihood directly, an alternate is to instead construct a lower bound that is more amenable to optimization. To do so, we note that evaluating the marginal likelihood $$p(\bx)$$ is at least as difficult as as evaluating the posterior $$p(\bz \mid \bx)$$ for any latent vector $$\bz$$ since by definition $$p(\bz \mid \bx) = p(\bx, \bz) / p(\bx)$$. 
+
+
+Next, we introduce a variational family $$\Q$$ of distributions that approximate the true, but intractable posterior $$p(\bz \mid \bx)$$. Further henceforth, we will assume a parameteric setting where any distribution in the model family $$\P_{\bx, \bz}$$ is specified via a set of parameters $$\theta \in \Theta$$ and distributions in the variational family $$\Q$$ are specified via a set of parameters $$\lambda \in \Lambda$$. 
+
+
+Given $$\P_{\bx, \bz}$$ and $$\Q$$, we note that the following relationships hold true[^2] for any $$\bx$$ and all variational distributions $$q_\lambda(\bz) \in \Q$$
+
+
+
 {% math %}
 \begin{align}
-\log \int p(\bx, \bz) \d \bz &= \log \int \frac{q(\bz)}{q(\bz)} p(\bx, \bz) \d \bz\\
-&\ge\int q(\bz) \log \frac{p(\bx, \bz)}{q(\bz)} \d \bz,
+\log p_\theta(\bx) &= \log \int p_\theta(\bx, \bz) \d \bz \\
+&= \log \int \frac{q_\lambda(\bz)}{q_\lambda(\bz)} p(\bx, \bz) \d \bz\\
+&\ge\int q_\lambda(\bz) \log \frac{p_\theta(\bx, \bz)}{q_\lambda(\bz)} \d \bz \\
+&= \Expect_{q_\lambda(\bz)} \left[\log \frac{p_\theta(\bx, \bz)}{q_\lambda(\bz)}\right],
 \end{align}
 {% endmath %}
-where the inequality arises from Jensen's inequality. The gap between the LHS (marginal log-likelihood) and the RHS (Evidence Lower Bound) is captured by the KL divergence $$\KL{q(\bz)}{p(\bz \giv \bx)}$$. The inequality is tight when the proposed distribution $$q(\bz)$$ exactly matches $$p(\bz \giv \bx)$$. In contrast to the marginal log-likelihood, the ELBO admits a tractable unbiased estimator
+where we have used Jensen's inequality in the final step. The Evidence Lower Bound or ELBO in short admits a tractable unbiased Monte Carlo estimator
 {% math %}
 \begin{align}
-\sum_i q(\bz^{(i)}) \log \frac{p(\bx, \bz)}{q(\bz^{(i)})} \text{, where } \bz^{(i)} \sim q(\bz),
+\frac{1}{k} \sum_{i=1}^k \log \frac{p_\theta(\bx, \bz^{(i)})}{q_\lambda(\bz^{(i)})} \text{, where } \bz^{(i)} \sim q_\lambda(\bz),
 \end{align}
 {% endmath %}
-so long as it is easy to sample from and compute densities for $$q(\bz)$$. Since the ELBO itself presents an optimization problem, the maximum marginal log-likelihood problem is now replaced with
+so long as it is easy to sample from and evaluate densities for $$q_\lambda(\bz)$$. 
+
+
+Which variational distribution should we pick? Even though the above derivation holds for any choice of variational parameters $$\lambda$$, the tightness of the lower bound depends on the specific choice of $$q$$. 
+
+
+<figure>
+<img src="klgap.png" alt="drawing" width="400" class="center"/>
+<figcaption>
+Illustration for the KL divergence gap between the marginal log-likelihood \(\log p_\theta(\bx)\) for a point \(\bx\) and the corresponding ELBO for a single 1D-parameter variational distribution \(q_\lambda(\bx)\).
+ </figcaption>
+</figure>
+
+In particular, the gap between the original objective(marginal log-likelihood $$\log p_\theta(\bx) $$) and the ELBO equals the KL divergence between the approximate posterior $$q(\bz)$$ and the true posterior $$p(\bz \giv \bx)$$. The gap is zero when the variational distribution $$q_\lambda(\bz)$$ exactly matches $$p_\theta(\bz \giv \bx)$$. 
+
+
+In summary, we can learn a latent variable model by maximizing the ELBO with respect to both the model parameters $$\theta$$ and the variational parameters $$\lambda$$ for any given datapoint $$\bx$$
 {% math %}
 \begin{align}
-\max_{p \in \P_{\bx, \bz}} \sum_{\bx \in \D} \paren{\max_{q \in \Q} \Expect_{q(\bz)} \log \frac{p(\bx, \bz)}{q(\bz)}}.
+\max_{\theta \in \Theta} \sum_{\bx \in \D} \max_{\lambda \in \Lambda} \Expect_{q(\bz)} \left[\log \frac{p(\bx, \bz)}{q(\bz)}\right].
 \end{align}
 {% endmath %}
+
+
+
 
 
 Black-Box Variational Inference
@@ -119,7 +176,7 @@ We then perform a single update step based on the mini-batch
 \theta \gets \theta + \tilde{\nabla}_\theta \sum_{i} \ELBO(\bx^{(i)}; \theta, \lambda^{(i)}),
 \end{align}
 {% endmath %}
-which corresponds to the step that hopefully moves $$p_\theta$$ closer to $$p_\D$$.
+which corresponds to the step that hopefully moves $$p_\theta$$ closer to $$p_{\mathrm{data}}$$.
 
 A Note on Gradient Estimation
 ==============
@@ -227,5 +284,5 @@ rather than running BBVI's **Step 1** as a subroutine. By leveraging the learnab
 
 Footnotes
 ==============
-
-[^1]: The first equality only holds if the support of $$q$$ includes that of $$p$$. If not, it is an inequality.
+[^1]: Computing the marginal likelihood $$p(\bx)$$ is at least as difficult as as computing the posterior $$p(\bz \mid \bx)$$ since by definition $$p(\bz \mid \bx) = p(\bx, \bz) / p(\bx)$$.
+[^2]: The first equality only holds if the support of $$q$$ includes that of $$p$$. If not, it is an inequality.

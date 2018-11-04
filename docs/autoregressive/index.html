@@ -77,11 +77,11 @@
 </script>
 
 
-<p>We begin our study with the autoregressive generative models. As before, we assume we are given access to a dataset <script type="math/tex">\mathcal{D}</script> of <script type="math/tex">n</script>-dimensional datapoints <script type="math/tex">\mathbf{x}</script>. For simplicity, we assume the datapoints are binary, i.e., <script type="math/tex">\mathbf{x} \in \{0,1\}^n</script>.</p>
+<p>We begin our study into generative modeling with autoregressive models. As before, we assume we are given access to a dataset <script type="math/tex">\mathcal{D}</script> of <script type="math/tex">n</script>-dimensional datapoints <script type="math/tex">\mathbf{x}</script>. For simplicity, we assume the datapoints are binary, i.e., <script type="math/tex">\mathbf{x} \in \{0,1\}^n</script>.</p>
 
 <h1 id="representation">Representation</h1>
 
-<p>By the chain rule of probability, we can factorize the joint distribution over the <script type="math/tex">n</script>-dimensions as:</p>
+<p>By the chain rule of probability, we can factorize the joint distribution over the <script type="math/tex">n</script>-dimensions as</p>
 
 <div class="mathblock"><script type="math/tex; mode=display">
 p(\mathbf{x}) = \prod\limits_{i=1}^{n}p(x_i \vert x_1, x_2, \ldots, x_{i-1}) = 
@@ -91,7 +91,7 @@ p(\mathbf{x}) = \prod\limits_{i=1}^{n}p(x_i \vert x_1, x_2, \ldots, x_{i-1}) =
 <p>where <script type="math/tex">% <![CDATA[
 \mathbf{x}_{< i}=[x_1, x_2, \ldots, x_{i-1}] %]]></script> denotes the vector of random variables with index less than <script type="math/tex">i</script>.</p>
 
-<p>The chain rule factorization can be expressed graphically as a Bayesian network:</p>
+<p>The chain rule factorization can be expressed graphically as a Bayesian network.</p>
 
 <figure>
 <img src="autoregressive.png" alt="drawing" width="400" class="center" />
@@ -111,7 +111,7 @@ p(x_n \vert \mathbf{x}_{< n}) %]]></script>. In order to fully specify this cond
 
 <p>In an <em>autoregressive generative model</em>, the conditionals are specified as parameterized functions with a fixed number of parameters. That is, we assume the conditional distributions <script type="math/tex">% <![CDATA[
 p(x_i \vert \mathbf{x}_{< i}) %]]></script> to correspond to a Bernoulli random variable and learn a function that maps the preceeding random variables <script type="math/tex">x_1, x_2, \ldots, x_{i-1}</script> to the
-mean of this distribution. Hence, we have:</p>
+mean of this distribution. Hence, we have</p>
 <div class="mathblock"><script type="math/tex; mode=display">
 p_{\theta_i}(x_i \vert \mathbf{x}_{< i}) = \mathrm{Bern}(f_i(x_1, x_2, \ldots, x_{i-1}))
 </script></div>
@@ -126,7 +126,7 @@ function <script type="math/tex">f_i: \{0,1\}^{i-1}\rightarrow [0,1]</script>.</
  A fully visible sigmoid belief network over four variables. The conditionals are denoted by \(\widehat{x}_1, \widehat{x}_2, \widehat{x}_3, \widehat{x}_4\) respectively.
  </figcaption>
 </figure>
-<p>In the simplest case, we can specify the function as a linear combination of the input elements followed by a sigmoid non-linearity (to restrict the output to lie between 0 and 1). This gives us the formulation of a <em>fully-visible sigmoid belief network</em> (<a href="https://papers.nips.cc/paper/1153-does-the-wake-sleep-algorithm-produce-good-density-estimators.pdf">FVSBN</a>):</p>
+<p>In the simplest case, we can specify the function as a linear combination of the input elements followed by a sigmoid non-linearity (to restrict the output to lie between 0 and 1). This gives us the formulation of a <em>fully-visible sigmoid belief network</em> (<a href="https://papers.nips.cc/paper/1153-does-the-wake-sleep-algorithm-produce-good-density-estimators.pdf">FVSBN</a>).</p>
 
 <div class="mathblock"><script type="math/tex; mode=display">
 f_i(x_1, x_2, \ldots, x_{i-1}) =\sigma(\alpha^{(i)}_0 + \alpha^{(i)}_1 x_1 + \ldots + \alpha^{(i)}_{i-1} x_{i-1})
@@ -134,7 +134,7 @@ f_i(x_1, x_2, \ldots, x_{i-1}) =\sigma(\alpha^{(i)}_0 + \alpha^{(i)}_1 x_1 + \ld
 
 <p>where <script type="math/tex">\sigma</script> denotes the sigmoid function and <script type="math/tex">\theta_i=\{\alpha^{(i)}_0,\alpha^{(i)}_1, \ldots, \alpha^{(i)}_{i-1}\}</script> denote the parameters of the mean function. The conditional for variable <script type="math/tex">i</script> requires <script type="math/tex">i</script> parameters, and hence the total number of parameters in the model is given by <script type="math/tex">\sum_{i=1}^ni= O(n^2)</script>. Note that the number of parameters are much fewer than the exponential complexity of the tabular case.</p>
 
-<p>A natural way to increase the expressiveness of an autoregressive generative model is to use more flexible parameterizations for the mean function e.g., multi-layer perceptrons (MLP). For example, consider the case of a neural network with 1 hidden layer. The mean function for variable <script type="math/tex">i</script> can be expressed as:</p>
+<p>A natural way to increase the expressiveness of an autoregressive generative model is to use more flexible parameterizations for the mean function e.g., multi-layer perceptrons (MLP). For example, consider the case of a neural network with 1 hidden layer. The mean function for variable <script type="math/tex">i</script> can be expressed as</p>
 
 <div class="mathblock"><script type="math/tex; mode=display">
 \mathbf{h}_i = \sigma(A_i \mathbf{x_{< i}} + \mathbf{c}_i)\\
@@ -151,7 +151,7 @@ are the set of parameters for the mean function <script type="math/tex">\mu_i(\c
  </figcaption>
 </figure>
 
-<p>The <em>Neural Autoregressive Density Estimator</em> (<a href="http://proceedings.mlr.press/v15/larochelle11a/larochelle11a.pdf">NADE</a>) provides an alternate MLP-based parameterization that is more statistically and computationally efficient than the vanilla approach. In NADE, parameters are shared across the functions used for evaluating the conditionals. In particular, the hidden layer activations are specified as:</p>
+<p>The <em>Neural Autoregressive Density Estimator</em> (<a href="http://proceedings.mlr.press/v15/larochelle11a/larochelle11a.pdf">NADE</a>) provides an alternate MLP-based parameterization that is more statistically and computationally efficient than the vanilla approach. In NADE, parameters are shared across the functions used for evaluating the conditionals. In particular, the hidden layer activations are specified as</p>
 
 <div class="mathblock"><script type="math/tex; mode=display">
 \mathbf{h}_i = \sigma(W_{., < i} \mathbf{x_{< i}} + \mathbf{c})\\
@@ -174,6 +174,12 @@ the full set of parameters for the mean functions <script type="math/tex">f_1(\c
   </li>
 </ol>
 
+<h3 id="extensions-to-nade">Extensions to NADE</h3>
+
+<p>The <a href="https://arxiv.org/abs/1306.0186">RNADE</a> algorithm extends NADE to learn generative models over real-valued data. Here, the conditionals are modeled via a continuous distribution such as a equi-weighted mixture of <script type="math/tex">K</script> Gaussians. Instead of learning a mean function, we know learn the means <script type="math/tex">\mu_{i,1}, \mu_{i,2},\ldots, \mu_{i,K}</script> and variances <script type="math/tex">\Sigma_{i,1}, \Sigma_{i,2},\ldots, \Sigma_{i,K}</script> of the <script type="math/tex">K</script> Gaussians for every conditional. For statistical and computational efficiency, a single function <script type="math/tex">g_i: \mathbb{R}^{i-1}\rightarrow\mathbb{R}^{2K}</script> outputs all the means and variances of the <script type="math/tex">K</script> Gaussians for the <script type="math/tex">i</script>-th conditional distribution.</p>
+
+<p>Notice that NADE requires specifying a single, fixed ordering of the variables. The choice of ordering can lead to different models. The <a href="https://arxiv.org/abs/1310.1757">EoNADE</a> algorithm allows training an ensemble of NADE models with different orderings.</p>
+
 <h1 id="learning-and-inference">Learning and inference</h1>
 
 <p>Recall that learning a generative model involves optimizing the closeness between the data and model distributions. One commonly used notion of closeness in the KL divergence between the data and the model distributions.</p>
@@ -185,7 +191,7 @@ the full set of parameters for the mean functions <script type="math/tex">f_1(\c
 
 <p>Before moving any further, we make two comments about the KL divergence. First, we note that the KL divergence between any two distributions is asymmetric. As we navigate through this chapter, the reader is encouraged to think what could go wrong if we decided to optimize the reverse KL divergence instead. Secondly, the KL divergences heavily penalizes any model distribution <script type="math/tex">p_\theta</script> which assigns low probability to a datapoint that is likely to be sampled under <script type="math/tex">p_{\mathrm{data}}</script>. In the extreme case, if the density <script type="math/tex">p_\theta(\mathbf{x})</script> evaluates to zero for a datapoint sampled from <script type="math/tex">p_{\mathrm{data}}</script>, the objective evaluates to <script type="math/tex">+\infty</script>.</p>
 
-<p>Since <script type="math/tex">p_{\mathrm{data}}</script> does not depend on <script type="math/tex">\theta</script>, we can equivalently recover the optimal parameters via maximizing likelihood estimation:</p>
+<p>Since <script type="math/tex">p_{\mathrm{data}}</script> does not depend on <script type="math/tex">\theta</script>, we can equivalently recover the optimal parameters via maximizing likelihood estimation.</p>
 
 <div class="mathblock"><script type="math/tex; mode=display">
 \max_{\theta\in \mathcal{M}}\mathbb{E}_{\mathbf{x} \sim p_{\mathrm{data}} }\left[\log p_{\theta}(\mathbf{x})\right].
@@ -193,7 +199,7 @@ the full set of parameters for the mean functions <script type="math/tex">f_1(\c
 
 <p>Here, <script type="math/tex">\log p_{\theta}(\mathbf{x})</script> is referred to as the log-likelihood of the datapoint <script type="math/tex">\mathbf{x}</script> with respect to the model distribution <script type="math/tex">p_\theta</script>.</p>
 
-<p>To approximate the expectation over the unknown <script type="math/tex">p_{\mathrm{data}}</script>, we make an assumption: points in the dataset <script type="math/tex">\mathcal{D}</script> are sampled i.i.d. from <script type="math/tex">p_{\mathrm{data}}</script>. This allows us to obtain an unbiased Monte Carlo estimate of the objective:</p>
+<p>To approximate the expectation over the unknown <script type="math/tex">p_{\mathrm{data}}</script>, we make an assumption: points in the dataset <script type="math/tex">\mathcal{D}</script> are sampled i.i.d. from <script type="math/tex">p_{\mathrm{data}}</script>. This allows us to obtain an unbiased Monte Carlo estimate of the objective as</p>
 
 <div class="mathblock"><script type="math/tex; mode=display">
 \max_{\theta\in \mathcal{M}}\frac{1}{\vert D \vert} \sum_{\mathbf{x} \in\mathcal{D} }\log p_{\theta}(\mathbf{x}) = \mathcal{L}(\theta \vert \mathcal{D}).
@@ -202,7 +208,7 @@ the full set of parameters for the mean functions <script type="math/tex">f_1(\c
 <p>The maximum likelihood estimation (MLE) objective has an intuitive interpretation: pick the model parameters <script type="math/tex">\theta \in \mathcal{M}</script> that maximize the log-probability of the observed datapoints in <script type="math/tex">\mathcal{D}</script>.</p>
 
 <p>In practice, we optimize the MLE objective using mini-batch gradient ascent. The algorithm operates in iterations. At every iteration <script type="math/tex">t</script>, we sample a mini-batch <script type="math/tex">\mathcal{B}_t</script> of datapoints sampled randomly from the dataset (<script type="math/tex">% <![CDATA[
-\vert \mathcal{B}_t\vert < \vert \mathcal{D} \vert %]]></script>) and compute gradients of the objective evaluated for the mini-batch. These parameters at iteration <script type="math/tex">t+1</script> are then given via the following update rule:</p>
+\vert \mathcal{B}_t\vert < \vert \mathcal{D} \vert %]]></script>) and compute gradients of the objective evaluated for the mini-batch. These parameters at iteration <script type="math/tex">t+1</script> are then given via the following update rule</p>
 <div class="mathblock"><script type="math/tex; mode=display">
 \theta^{(t+1)} = \theta^{(t)} + r_t \nabla_\theta\mathcal{L}(\theta^{(t)} \vert \mathcal{B}_t)
 </script></div>
@@ -211,7 +217,7 @@ the full set of parameters for the mean functions <script type="math/tex">f_1(\c
 
 <p>From a practical standpoint, we must think about how to choose hyperaparameters (such as the initial learning rate) and a stopping criteria for the gradient descent. For both these questions, we follow the standard practice in machine learning of monitoring the objective on a validation dataset. Consequently, we choose the hyperparameters with the best performance on the validation dataset and stop updating the parameters when the validation log-likelihoods cease to improve<sup id="fnref:1"><a href="#fn:1" class="footnote">1</a></sup>.</p>
 
-<p>Now that we have a well-defined objective and optimization procedure, the only remaining task is to evaluate the objective in the context of an autoregressive generative model. To this end, we substitute the factorized joint distribution of an autoregressive model in the MLE objective to get:</p>
+<p>Now that we have a well-defined objective and optimization procedure, the only remaining task is to evaluate the objective in the context of an autoregressive generative model. To this end, we substitute the factorized joint distribution of an autoregressive model in the MLE objective to get</p>
 
 <div class="mathblock"><script type="math/tex; mode=display">
 \max_{\theta \in \mathcal{M}}\frac{1}{\vert D \vert} \sum_{\mathbf{x} \in\mathcal{D} }\sum_{i=1}^n\log p_{\theta_i}(x_i \vert \mathbf{x}_{< i})
@@ -230,15 +236,11 @@ collective set of parameters for the conditionals.</p>
 
 <p>Finally, an autoregressive model does not directly learn unsupervised representations of the data. In the next few set of lectures, we will look at latent variable models (e.g., variational autoencoders) which explicitly learn latent representations of the data.</p>
 
-<h1 id="additional-parameterizations">Additional parameterizations</h1>
+<!-- 
 
-<h3 id="nade">NADE++</h3>
-
-<p>The <a href="https://arxiv.org/abs/1306.0186">RNADE</a> algorithm extends NADE to learn generative models over real-valued data. Here, the conditionals are modeled via a continuous distribution such as a equi-weighted mixture of <script type="math/tex">K</script> Gaussians. Instead of learning a mean function, we know learn the means <script type="math/tex">\mu_{i,1}, \mu_{i,2},\ldots, \mu_{i,K}</script> and variances <script type="math/tex">\Sigma_{i,1}, \Sigma_{i,2},\ldots, \Sigma_{i,K}</script> of the <script type="math/tex">K</script> Gaussians for every conditional. For statistical and computational efficiency, a single function <script type="math/tex">g_i: \mathbb{R}^{i-1}\rightarrow\mathbb{R}^{2K}</script> outputs all the means and variances of the <script type="math/tex">K</script> Gaussians for the <script type="math/tex">i</script>-th conditional distribution.</p>
-
-<p>Notice that NADE requires specifying a single, fixed ordering of the variables. The choice of ordering can lead to different models. The <a href="https://arxiv.org/abs/1310.1757">EoNADE</a> algorithm allows training an ensemble of NADE models with different orderings.</p>
-
-<p>Coming soon: MADE, Char-RNN, Pixel-CNN, Wavenet</p>
+Additional parameterizations
+==============
+Coming soon: MADE, Char-RNN, Pixel-CNN, Wavenet -->
 
 <h1 id="footnotes">Footnotes</h1>
 

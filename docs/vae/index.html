@@ -102,22 +102,35 @@
 \DeclareMathOperator*{\argmax}{arg\,max}
 </script></div>
 
-<p>The goal of this post is to provide a look at some of the core mathematical principles of the variational autoencoder. We shall do so by developing the variational autoencoder “from scratch”, starting with a latent variable model and culminating with the use of deep neural networks to train the generative model with a variational procedure.</p>
+<p>Latent variable models form a rich class of probabilistic models that can infer hidden structure in the underlying data. In this post, we will study variational autoencoders, which are a powerful class of deep generative models with latent variables.</p>
 
-<p>We begin by considering a directed latent variable model of the following form</p>
+<h1 id="representation">Representation</h1>
+
+<p>Consider a directed, latent variable model as shown below.</p>
+
+<figure>
+<img src="vae.png" alt="drawing" width="100" class="center" />
+<figcaption>
+Graphical model for a directed, latent variable model.
+ </figcaption>
+</figure>
+
+<p>In the model above, <script type="math/tex">\bz</script> and <script type="math/tex">\bx</script> denote the latent and observed variables respectively. The joint distribution expressed by this model is given as</p>
 <div class="mathblock"><script type="math/tex; mode=display">
-p(\bx, \bz) = p(\bx \giv \bz)p(\bz),
+p_\theta(\bx, \bz) = p(\bx \giv \bz)p(\bz).
 </script></div>
-<p>where <script type="math/tex">\bz</script> is the latent variable and <script type="math/tex">\bx</script> is the observed variable. This model describes a generative process that samples <script type="math/tex">\bx</script> using the procedure</p>
+
+<p>From a generative modeling perspective, this model describes a generative process for the observed data <script type="math/tex">\bx</script> using the following procedure</p>
 <div class="mathblock"><script type="math/tex; mode=display">
 \begin{align}
 \bz &\sim p(\bz) \\
 \bx &\sim p(\bx \giv \bz).
 \end{align}
 </script></div>
-<p>As such, we shall call this our generative model. If one adopts the belief that the latent variable <script type="math/tex">\bz</script> somehow encodes semantically meaningful information about <script type="math/tex">\bx</script>, it is natural to view this generative process as first generating the “high-level” semantic information about <script type="math/tex">\bx</script> first before fully generating <script type="math/tex">\bx</script>. Such a perspective motivates generative models with rich latent variable structures such as hierarchical generative models <script type="math/tex">p(\bx, \bz_1, \ldots, \bz_m) = p(\bx \giv \bz_1)\prod_i p(\bz_i \giv \bz_{i+1})</script>—where information about <script type="math/tex">\bx</script> is generated hierarchically—and temporal models such as the Hidden Markov Model—where temporally-related high-level information is generated first before constructing <script type="math/tex">\bx</script>.</p>
 
-<p>We now consider a family of distributions <script type="math/tex">\P_\bz</script> where <script type="math/tex">p(\bz) \in \P_\bz</script> describes a probability distribution over <script type="math/tex">\bz</script>. Next, consider a family of conditional distributions <script type="math/tex">\P_{\bx\giv \bz}</script> where <script type="math/tex">p(\bx \giv \bz) \in \P_{\bx\giv \bz}</script> describes a conditional probability distribution over <script type="math/tex">\bx</script> given <script type="math/tex">\bz</script>. Then our hypothesis class of generative models is the set of all possible combinations</p>
+<p>If one adopts the belief that the latent variables <script type="math/tex">\bz</script> somehow encode semantically meaningful information about <script type="math/tex">\bx</script>, it is natural to view this generative process as first generating the “high-level” semantic information about <script type="math/tex">\bx</script> first before fully generating <script type="math/tex">\bx</script>. Such a perspective motivates generative models with rich latent variable structures such as hierarchical generative models <script type="math/tex">p(\bx, \bz_1, \ldots, \bz_m) = p(\bx \giv \bz_1)\prod_i p(\bz_i \giv \bz_{i+1})</script>—where information about <script type="math/tex">\bx</script> is generated hierarchically—and temporal models such as the Hidden Markov Model—where temporally-related high-level information is generated first before constructing <script type="math/tex">\bx</script>.</p>
+
+<p>We now consider a family of distributions <script type="math/tex">\P_\bz</script> where <script type="math/tex">p(\bz) \in \P_\bz</script> describes a probability distribution over <script type="math/tex">\bz</script>. Next, consider a family of conditional distributions <script type="math/tex">\P_{\bx\giv \bz}</script> where <script type="math/tex">p_\theta(\bx \giv \bz) \in \P_{\bx\giv \bz}</script> describes a conditional probability distribution over <script type="math/tex">\bx</script> given <script type="math/tex">\bz</script>. Then our hypothesis class of generative models is the set of all possible combinations</p>
 <div class="mathblock"><script type="math/tex; mode=display">
 \begin{align}
 \P_{\bx,\bz} = \set{p(\bx, \bz) \giv p(\bz) \in \P_\bz, p(\bx \giv \bz) \in \P_{\bx\giv\bz}}.
@@ -126,47 +139,76 @@ p(\bx, \bz) = p(\bx \giv \bz)p(\bz),
 <p>Given a dataset <script type="math/tex">\D = \set{\bx^{(1)}, \ldots, \bx^{(n)}}</script>, we are interested in the following learning and inference tasks</p>
 <ul>
   <li>Selecting <script type="math/tex">p \in \P_{\bx,\bz}</script> that “best” fits <script type="math/tex">\D</script>.</li>
-  <li>Approximate inference of <script type="math/tex">\bz</script>: given a sample <script type="math/tex">\bx</script>, how do we impute its latent variable <script type="math/tex">\bz</script>?
+  <li>Given a sample <script type="math/tex">\bx</script> and a model <script type="math/tex">p \in \P_{\bx,\bz}</script>, what is the posterior distribution over the latent variables <script type="math/tex">\bz</script>?
 <!-- - Approximate marginal inference of $$\bx$$: given partial access to certain dimensions of the vector $$\bx$$, how do we impute the missing parts? --></li>
 </ul>
 
-<p>We shall also assume the following</p>
-<ul>
-  <li>Intractability: computing the posterior probability <script type="math/tex">p(\bz \giv \bx)</script> is intractable.</li>
-  <li>Big data: the dataset <script type="math/tex">\D</script> is too large to fit in memory; we can only work with small, sub-sampled batches of <script type="math/tex">\D</script>.</li>
-</ul>
+<!-- We shall also assume the following
+- Intractability: computing the posterior probability $$p(\bz \giv \bx)$$ is intractable.
+- Big data: the dataset $$\D$$ is too large to fit in memory; we can only work with small, sub-sampled batches of $$\D$$. -->
 
 <h1 id="learning-directed-latent-variable-models">Learning Directed Latent Variable Models</h1>
 
-<p>One way to measure how closely <script type="math/tex">p(\bx, \bz)</script> fits the data <script type="math/tex">\D</script> is to measure the Kullback-Leibler (KL) divergence between the data distribution (which we denote as <script type="math/tex">p_\D(\bx)</script>) and the model’s marginal distribution <script type="math/tex">p(\bx) = \int p(\bx, \bz) \d \bz</script>,</p>
+<p>One way to measure how closely <script type="math/tex">p(\bx, \bz)</script> fits the observed dataset <script type="math/tex">\D</script> is to measure the Kullback-Leibler (KL) divergence between the data distribution (which we denote as <script type="math/tex">p_{\mathrm{data}}(\bx)</script>) and the model’s marginal distribution <script type="math/tex">p(\bx) = \int p(\bx, \bz) \d \bz</script>. The distribution that ``best’’ fits the data is thus obtained by minimizing the KL divergence.</p>
+
 <div class="mathblock"><script type="math/tex; mode=display">
 \begin{align}
-\KL{p_\D(\bx)}{p(\bx)}.
+\min_{p \in \P_{\bx, \bz}}\KL{p_{\mathrm{data}}(\bx)}{p(\bx)}.
 \end{align}
 </script></div>
-<p>The distribution that ``best’’ fits is thus <script type="math/tex">p \in \P_{\bx, \bz}</script> that minimizes the KL divergence. Equivalently, we wish to solve the maximum marginal log-likelihood problem</p>
+
+<p>As we have seen previously, optimizing an empirical estimate of the KL divergence is equivalent to maximizing the marginal log-likelihood <script type="math/tex">\log p(\bz)</script> over <script type="math/tex">\D</script></p>
 <div class="mathblock"><script type="math/tex; mode=display">
 \begin{align}
-\max_{p \in \P_{\bx, \bz}} \sum_{\bx \in \D} \log \int p(\bx, \bz) \d \bz.
+\max_{p \in \P_{\bx, \bz}} \sum_{\bx \in \D} \log p(\bx) = \sum_{\bx \in \D} \int p(\bx, \bz) \d \bz.
 \end{align}
 </script></div>
-<p>However, this problem is intractable due to the difficulty of marginalizing the latent variable—which is as difficult as computing the posterior <script type="math/tex">p(\bz \mid \bx)</script>. Rather than maximizing the log-likelihood directly, we instead construct a lower bound that is more amenable to optimization. To do so, we introduce a variational family <script type="math/tex">\Q</script> and note that the following relationships hold true<sup id="fnref:1"><a href="#fn:1" class="footnote">1</a></sup> for all proposal distributions <script type="math/tex">q(\bz) \in \Q</script></p>
+
+<p>However, it turns out this problem is generally intractable for high-dimensional <script type="math/tex">\bz</script> as it involves an integration (or sums in the case <script type="math/tex">\bz</script> is discrete) over all the possible latent sources of variation <script type="math/tex">\bz</script>. One option is to estimate the objective via Monte Carlo. For any given datapoint <script type="math/tex">\bf x</script>, we can obtain the following estimate for its marginal log-likelihood</p>
+
+<div class="mathblock"><script type="math/tex; mode=display">
+\log p(\bx) \approx \frac{1}{k} \sum_{i=1}^k \log p(\bx \vert \bz^{(i)})
+</script></div>
+
+<p>In practice however, the above estimate however has high variance and is not optimized in practice.</p>
+
+<p>Rather than maximizing the log-likelihood directly, an alternate is to instead construct a lower bound that is more amenable to optimization. To do so, we note that evaluating the marginal likelihood <script type="math/tex">p(\bx)</script> is at least as difficult as as evaluating the posterior <script type="math/tex">p(\bz \mid \bx)</script> for any latent vector <script type="math/tex">\bz</script> since by definition <script type="math/tex">p(\bz \mid \bx) = p(\bx, \bz) / p(\bx)</script>.</p>
+
+<p>Next, we introduce a variational family <script type="math/tex">\Q</script> of distributions that approximate the true, but intractable posterior <script type="math/tex">p(\bz \mid \bx)</script>. Further henceforth, we will assume a parameteric setting where any distribution in the model family <script type="math/tex">\P_{\bx, \bz}</script> is specified via a set of parameters <script type="math/tex">\theta \in \Theta</script> and distributions in the variational family <script type="math/tex">\Q</script> are specified via a set of parameters <script type="math/tex">\lambda \in \Lambda</script>.</p>
+
+<p>Given <script type="math/tex">\P_{\bx, \bz}</script> and <script type="math/tex">\Q</script>, we note that the following relationships hold true<sup id="fnref:2"><a href="#fn:2" class="footnote">1</a></sup> for any <script type="math/tex">\bx</script> and all variational distributions <script type="math/tex">q_\lambda(\bz) \in \Q</script></p>
+
 <div class="mathblock"><script type="math/tex; mode=display">
 \begin{align}
-\log \int p(\bx, \bz) \d \bz &= \log \int \frac{q(\bz)}{q(\bz)} p(\bx, \bz) \d \bz\\
-&\ge\int q(\bz) \log \frac{p(\bx, \bz)}{q(\bz)} \d \bz,
+\log p_\theta(\bx) &= \log \int p_\theta(\bx, \bz) \d \bz \\
+&= \log \int \frac{q_\lambda(\bz)}{q_\lambda(\bz)} p(\bx, \bz) \d \bz\\
+&\ge\int q_\lambda(\bz) \log \frac{p_\theta(\bx, \bz)}{q_\lambda(\bz)} \d \bz \\
+&= \Expect_{q_\lambda(\bz)} \left[\log \frac{p_\theta(\bx, \bz)}{q_\lambda(\bz)}\right],
 \end{align}
 </script></div>
-<p>where the inequality arises from Jensen’s inequality. The gap between the LHS (marginal log-likelihood) and the RHS (Evidence Lower Bound) is captured by the KL divergence <script type="math/tex">\KL{q(\bz)}{p(\bz \giv \bx)}</script>. The inequality is tight when the proposed distribution <script type="math/tex">q(\bz)</script> exactly matches <script type="math/tex">p(\bz \giv \bx)</script>. In contrast to the marginal log-likelihood, the ELBO admits a tractable unbiased estimator</p>
+<p>where we have used Jensen’s inequality in the final step. The Evidence Lower Bound or ELBO in short admits a tractable unbiased Monte Carlo estimator</p>
 <div class="mathblock"><script type="math/tex; mode=display">
 \begin{align}
-\sum_i q(\bz^{(i)}) \log \frac{p(\bx, \bz)}{q(\bz^{(i)})} \text{, where } \bz^{(i)} \sim q(\bz),
+\frac{1}{k} \sum_{i=1}^k \log \frac{p_\theta(\bx, \bz^{(i)})}{q_\lambda(\bz^{(i)})} \text{, where } \bz^{(i)} \sim q_\lambda(\bz),
 \end{align}
 </script></div>
-<p>so long as it is easy to sample from and compute densities for <script type="math/tex">q(\bz)</script>. Since the ELBO itself presents an optimization problem, the maximum marginal log-likelihood problem is now replaced with</p>
+<p>so long as it is easy to sample from and evaluate densities for <script type="math/tex">q_\lambda(\bz)</script>.</p>
+
+<p>Which variational distribution should we pick? Even though the above derivation holds for any choice of variational parameters <script type="math/tex">\lambda</script>, the tightness of the lower bound depends on the specific choice of <script type="math/tex">q</script>.</p>
+
+<figure>
+<img src="klgap.png" alt="drawing" width="400" class="center" />
+<figcaption>
+Illustration for the KL divergence gap between the marginal log-likelihood \(\log p_\theta(\bx)\) for a point \(\bx\) and the corresponding ELBO for a single 1D-parameter variational distribution \(q_\lambda(\bx)\).
+ </figcaption>
+</figure>
+
+<p>In particular, the gap between the original objective(marginal log-likelihood <script type="math/tex">\log p_\theta(\bx)</script>) and the ELBO equals the KL divergence between the approximate posterior <script type="math/tex">q(\bz)</script> and the true posterior <script type="math/tex">p(\bz \giv \bx)</script>. The gap is zero when the variational distribution <script type="math/tex">q_\lambda(\bz)</script> exactly matches <script type="math/tex">p_\theta(\bz \giv \bx)</script>.</p>
+
+<p>In summary, we can learn a latent variable model by maximizing the ELBO with respect to both the model parameters <script type="math/tex">\theta</script> and the variational parameters <script type="math/tex">\lambda</script> for any given datapoint <script type="math/tex">\bx</script></p>
 <div class="mathblock"><script type="math/tex; mode=display">
 \begin{align}
-\max_{p \in \P_{\bx, \bz}} \sum_{\bx \in \D} \paren{\max_{q \in \Q} \Expect_{q(\bz)} \log \frac{p(\bx, \bz)}{q(\bz)}}.
+\max_{\theta \in \Theta} \sum_{\bx \in \D} \max_{\lambda \in \Lambda} \Expect_{q(\bz)} \left[\log \frac{p(\bx, \bz)}{q(\bz)}\right].
 \end{align}
 </script></div>
 
@@ -194,7 +236,7 @@ p(\bx, \bz) = p(\bx \giv \bz)p(\bz),
 \theta \gets \theta + \tilde{\nabla}_\theta \sum_{i} \ELBO(\bx^{(i)}; \theta, \lambda^{(i)}),
 \end{align}
 </script></div>
-<p>which corresponds to the step that hopefully moves <script type="math/tex">p_\theta</script> closer to <script type="math/tex">p_\D</script>.</p>
+<p>which corresponds to the step that hopefully moves <script type="math/tex">p_\theta</script> closer to <script type="math/tex">p_{\mathrm{data}}</script>.</p>
 
 <h1 id="a-note-on-gradient-estimation">A Note on Gradient Estimation</h1>
 
@@ -297,11 +339,10 @@ p_\theta(\bz) = \Normal(\bz \giv \0, \I).
 <p>rather than running BBVI’s <strong>Step 1</strong> as a subroutine. By leveraging the learnability of <script type="math/tex">\bx \mapsto \lambda^*</script>, this optimization procedure amortizes the cost of variational inference. If one further chooses to define <script type="math/tex">f_\phi</script> as a neural network, the result is the variational autoencoder.</p>
 
 <h1 id="footnotes">Footnotes</h1>
-
 <div class="footnotes">
   <ol>
-    <li id="fn:1">
-      <p>The first equality only holds if the support of <script type="math/tex">q</script> includes that of <script type="math/tex">p</script>. If not, it is an inequality. <a href="#fnref:1" class="reversefootnote">&#8617;</a></p>
+    <li id="fn:2">
+      <p>The first equality only holds if the support of <script type="math/tex">q</script> includes that of <script type="math/tex">p</script>. If not, it is an inequality. <a href="#fnref:2" class="reversefootnote">&#8617;</a></p>
     </li>
   </ol>
 </div>

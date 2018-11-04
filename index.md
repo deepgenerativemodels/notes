@@ -13,10 +13,9 @@ You too may help make these notes better by submitting your improvements to us v
 
 2. [Autoregressive Models](autoregressive/)
 
-3. [Variational Autoencoders](vae/) <!-- Coming soon! -->
+3. [Variational Autoencoders](vae/) 
 
-4. [Normalizing Flow Models] Coming soon!
+4. [Normalizing Flow Models](flow/) 
 
-5. [Generative Adversarial Networks](gans/)
+5. [Generative Adversarial Networks](gan/)
 
-6. [Energy-based models] Coming soon!

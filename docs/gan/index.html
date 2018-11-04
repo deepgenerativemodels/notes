@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Generative Adversarial Networks</title>
+  <meta name="description" content="Lecture notes for Deep Generative Models.">
+
+
+  <link rel="stylesheet" href="/notes/css/tufte.css">	
+  
+
+  <!-- Google Fonts loaded here depending on setting in _data/options.yml true loads font, blank does not-->
+  
+    <link href='//fonts.googleapis.com/css?family=Lato:400,400italic' rel='stylesheet' type='text/css'>
+  
+  <!-- Load up MathJax script if needed ... specify in /_data/options.yml file-->
+  
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-75587219-1', 'auto');
+  ga('send', 'pageview');
+
+  </script>
+
+  <link rel="canonical" href="http://localhost:4000/notes/gan/">
+  <link rel="alternate" type="application/rss+xml" title="Deep Generative Models" href="http://localhost:4000/notes/feed.xml" />
+</head>
+
+  <body>
+    <!--- Header and nav template site-wide -->
+<header>
+    <nav class="group">
+        <a href="/notes/">Contents</a>
+	<a href="http://deepgenerativemodels.github.io">Class</a>
+	<a href="http://github.com/deepgenerativemodels/notes">Github</a>
+	</nav>
+</header>
+
+    <article class="group">
+      <h1>Generative adversarial networks</h1>
+<p class="subtitle"></p>
+
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    TeX: {
+      Macros: {
+        e: "\\epsilon",
+        xti: "x^{(i)}",
+        yti: "y^{(i)}",
+        bfy: "{\\bf y}",
+        bfx: "{\\bf x}",
+        bfg: "{\\bf g}",
+        bfbeta: "{\\bf \\beta}",
+        tp: "\\tilde p",
+        pt: "p_\\theta",
+        Exp: "{\\mathbb{E}}",
+        Ind: "{\\mathbb{I}}",
+        KL: "{\\mathbb{KL}}",
+        Dc: "{\\mathcal{D}}",
+        Tc: "{\\mathcal{T}}",
+        Xc: "{\\mathcal{X}}",
+        note: ["\\textcolor{blue}{[NOTE: #1]}",1]
+      }
+    }
+  });
+</script>
+
+
+<p>We now move onto another family of generative models called generative adversarial networks (GANs). GANs are unique from all the other model families that we have seen so far, such as autoregressive models, VAEs, and normalizing flow models, because we do not train them using maximum likelihood.</p>
+
+<h1 id="likelihood-free-learning">Likelihood-free learning</h1>
+
+<p>Why not? In fact, it is not so clear that better likelihood numbers necessarily correspond to higher sample quality. We know that the <em>optimal generative model</em> will give us the best sample quality and highest test log-likelihood. However, models with high test log-likelihoods can still yield poor samples, and vice versa. To see why, consider pathological cases in which our model is comprised almost entirely of noise, or our model simply memorizes the training set. Therefore, we turn to <em>likelihood-free training</em> with the hope that optimizing a different objective will allow us to disentangle our desiderata of obtaining high likelihoods as well as high-quality samples.</p>
+
+<p>Recall that maximum likelihood required us to evaluate the likelihood of the data under our model <script type="math/tex">p_\theta</script>. A natural way to set up a likelihood-free objective is to consider the <em>two-sample test</em>, a statistical test that determines whether or not a finite set of samples from two distributions are from the same distribution <em>using only samples from <script type="math/tex">P</script> and <script type="math/tex">Q</script></em>. Concretely, given <script type="math/tex">S_1 = \{\mathbf{x} \sim P\}</script> and <script type="math/tex">S_2 = \{\mathbf{x} \sim Q\}</script>, we compute a test statistic <script type="math/tex">T</script> according to the difference in <script type="math/tex">S_1</script> and <script type="math/tex">S_2</script> that, when less than a threshold <script type="math/tex">\alpha</script>, accepts the null hypothesis that <script type="math/tex">P = Q</script>.</p>
+
+<p>Analogously, we have in our generative modeling setup access to our training set <script type="math/tex">S_1 = \mathcal{D} = \{\mathbf{x} \sim p_{\textrm{data}} \}</script> and <script type="math/tex">S_2 = \{\mathbf{x} \sim p_{\theta} \}</script>. The key idea is to train the model to minimize a <em>two-sample test objective</em> between <script type="math/tex">S_1</script> and <script type="math/tex">S_2</script>. But this objective becomes extremely difficult to work with in high dimensions, so we choose to optimize a surrogate objective that instead <em>maximizes some distance</em> between <script type="math/tex">S_1</script> and <script type="math/tex">S_2</script>.</p>
+
+<h1 id="gan-objective">GAN Objective</h1>
+
+<p>We thus arrive at the generative adversarial network formulation. There are two components in a GAN: (1) a generator and (2) a discriminator. The generator <script type="math/tex">G_\theta</script> is a directed latent variable model that deterministically generates samples <script type="math/tex">\mathbf{x}</script> from <script type="math/tex">\mathbf{z}</script>, and the discriminator <script type="math/tex">D_\phi</script> is a function whose job is to distinguish samples from the real dataset and the generator. The image below is a graphical model of <script type="math/tex">G_\theta</script> and <script type="math/tex">D_\phi</script>. <script type="math/tex">\mathbf{x}</script> denotes samples (either from data or generator), <script type="math/tex">\mathbf{z}</script> denotes our noise vector, and <script type="math/tex">\mathbf{y}</script> denotes the discriminator’s prediction about <script type="math/tex">\mathbf{x}</script>.</p>
+
+<figure>
+<center><img src="gan.png" alt="drawing" width="300" class="center" /></center>
+<!-- <figcaption>
+Graphical model of generator $$G_\theta$$ and discriminator $$D_\phi$$.
+ </figcaption> -->
+</figure>
+
+<p>The generator and discriminator both play a two player minimax game, where the generator minimizes a two-sample test objective (<script type="math/tex">p_{\textrm{data}} = p_\theta</script>) and the discriminator maximizes the objective (<script type="math/tex">p_{\textrm{data}} \neq p_\theta</script>). Intuitively, the generator tries to fool the discriminator to the best of its ability by generating samples that look indisginguishable from <script type="math/tex">p_{\textrm{data}}</script>.</p>
+
+<p>Formally, the GAN objective can be written as:</p>
+
+<div class="mathblock"><script type="math/tex; mode=display">
+\min_{\theta} \max_{\phi} V(G_\theta, D_\phi) = \mathbb{E}_{\mathbf{x} \sim \textbf{p}_{\textrm{data}}}[\log D_\phi(\textbf{x})] + 
+\mathbb{E}_{\mathbf{z} \sim p(\textbf{z})}[1 - \log D_\phi(G_\theta(\textbf{z}))]
+</script></div>
+
+<p>Let’s unpack this expression. We know that the discriminator is maximizing this function with respect to its parameters <script type="math/tex">\phi</script>, where given a fixed generator <script type="math/tex">G_\theta</script> it is performing binary classification: it assigns probability 1 to data points from the training set <script type="math/tex">\mathbf{x} \sim p_{\textrm{data}}</script>, and assigns probability 0 to generated samples <script type="math/tex">\mathbf{x} \sim p_G</script>. In this setup, the optimal discriminator is:</p>
+
+<div class="mathblock"><script type="math/tex; mode=display">
+D^*_{G}(\mathbf{x}) = \frac{p_{\textrm{data}}(\mathbf{x})}{p_{\textrm{data}}(\mathbf{x}) + p_G(\mathbf{x})}
+</script></div>
+
+<p>On the other hand, the generator minimizes this objective for a fixed discriminator <script type="math/tex">D_\phi</script>. And after performing some algebra, plugging in the optimal discriminator <script type="math/tex">D^*_G(\cdot)</script> into the overall objective <script type="math/tex">V(G_\theta, D^*_G(\mathbf{x}))</script> gives us:</p>
+
+<div class="mathblock"><script type="math/tex; mode=display">
+2D_{\textrm{JSD}}[p_{\textrm{data}}, p_G] - \log 4
+</script></div>
+
+<p>The <script type="math/tex">D_{\textrm{JSD}}</script> term is the <em>Jenson-Shannon Divergence</em>, which is also known as the symmetric form of the KL divergence:</p>
+
+<div class="mathblock"><script type="math/tex; mode=display">
+D_{\textrm{JSD}}[p, q] = \frac{1}{2} \left( D_{\textrm{KL}}\left[p, \frac{p+q}{2} \right] + D_{\textrm{KL}}\left[q, \frac{p+q}{2} \right] \right)
+</script></div>
+
+<p>The JSD satisfies all properties of the KL, and has the additional perk that <script type="math/tex">D_{\textrm{JSD}}[p,q] = D_{\textrm{JSD}}[q,p]</script>. With this distance metric, the optimal generator for the GAN objective becomces <script type="math/tex">p_G = p_{\textrm{data}}</script>, and the optimal objective value that we can achieve with optimal generators and discriminators <script type="math/tex">G^*(\cdot)</script> and <script type="math/tex">D^*_{G^*}(\mathbf{x})</script> is <script type="math/tex">-\log 4</script>.</p>
+
+<h1 id="gan-training-algorithm">GAN training algorithm</h1>
+
+<p>Thus, the way in which we train a GAN is as follows:</p>
+
+<p>For epochs <script type="math/tex">1, \ldots, N</script> do:</p>
+<ol>
+  <li>Sample minibatch of size <script type="math/tex">m</script> from data: <script type="math/tex">\mathbf{x}^{(1)}, \ldots, \mathbf{x}^{(m)} \sim \mathcal{D}</script></li>
+  <li>Sample minibatch of size <script type="math/tex">m</script> of noise: <script type="math/tex">\mathbf{z}^{(1)}, \ldots, \mathbf{z}^{(m)} \sim p_z</script></li>
+  <li>Take a gradient <em>descent</em> step on the generator parameters <script type="math/tex">\theta</script>:
+    <div class="mathblock"><script type="math/tex; mode=display">
+ \triangledown_\theta V(G_\theta, D_\phi) = \frac{1}{m} \triangledown_\theta \sum_{i=1}^m \log \left(1 - D_\phi(G_\theta(\mathbf{z}^{(i)})) \right)
+ </script></div>
+  </li>
+  <li>Take a gradient <em>ascent</em> step on the discriminator parameters <script type="math/tex">\phi</script>:
+    <div class="mathblock"><script type="math/tex; mode=display">
+ \triangledown_\phi V(G_\theta, D_\phi) = \frac{1}{m} \triangledown_\phi \sum_{i=1}^m \log \left[\log D_\phi(\mathbf{x}^{(i)}) + \log (1 - D_\phi(G_\theta(\mathbf{z}^{(i)}))) \right]
+ </script></div>
+  </li>
+</ol>
+
+<h1 id="challenges">Challenges</h1>
+
+<p>Although GANs have been successfully applied to several domains and tasks, working with them in practice is challenging because of their: (1) unstable optimization procedure, (2) potential for mode collapse, (3) difficulty in evaluation.</p>
+
+<p>During optimization, the generator and discriminator loss often continue to oscillate without converging to a clear stopping point. Due to the lack of a robust stopping criteria, it is difficult to know when exactly the GAN has finished training. Additionally, the generator of a GAN can often get stuck producing one of a few types of samples over and over again (mode collapse). Most fixes to these challenges are empirically driven, and there has been a significant amount of work put into developing new architectures, regularization schemes, and noise perturbations in an attempt to circumvent these issues. Soumith Chintala has a nice <a href="https://github.com/soumith/ganhacks">link</a> outlining various tricks of the trade to stabilize GAN training.</p>
+
+<h1 id="selected-gans">Selected GANs</h1>
+
+<p>Next, we focus our attention to a few select types of GAN architectures and explore them in more detail.</p>
+
+<h3 id="f-gan">f-GAN</h3>
+<p>The <a href="https://arxiv.org/abs/1606.00709">f-GAN</a> optimizes the variant of the two-sample test objective that we have discussed so far, but using a very general notion of distance: the <script type="math/tex">f divergence</script>. Given two densities <script type="math/tex">p</script> and <script type="math/tex">q</script>, the <script type="math/tex">f</script>-divergence can be written as:</p>
+
+<div class="mathblock"><script type="math/tex; mode=display">
+D_f(p,q) = \mathbb{E}_{\mathbf{x}\sim q}\left[f \left(\frac{p(\mathbf{x})}{q(\mathbf{x})} \right) \right]
+</script></div>
+<p>where <script type="math/tex">f</script> is any convex<sup id="fnref:1"><a href="#fn:1" class="footnote">1</a></sup>, lower-semicontinuous<sup id="fnref:2"><a href="#fn:2" class="footnote">2</a></sup> function with <script type="math/tex">f(1) = 0</script>. Several of the distance “metrics” that we have seen so far fall under the class of f-divergences, such as KL, Jenson-Shannon, and total variation.</p>
+
+<p>To set up the f-GAN objective, we borrow two commonly used tools from convex optimization<sup id="fnref:3"><a href="#fn:3" class="footnote">3</a></sup>: the Fenchel conjugate and duality. Specifically, we obtain a lower bound to any f-divergence via its Fenchel conjugate:</p>
+
+<div class="mathblock"><script type="math/tex; mode=display">
+D_f(p,q) \geq \sup_{T \in \mathcal{T}} \left(\mathbb{E}_{x \sim p}[T(\mathbf{x})] - \mathbb{E}_{x \sim q}[f^*(T(\mathbf{x}))] \right)
+</script></div>
+
+<p>Therefore we can choose any f-divergence that we desire, let <script type="math/tex">p = p_{\textrm{data}}</script> and <script type="math/tex">q = p_G</script>, parameterize <script type="math/tex">T</script> by <script type="math/tex">\phi</script> and <script type="math/tex">G</script> by <script type="math/tex">\theta</script>, and obtain the following fGAN objective:</p>
+
+<div class="mathblock"><script type="math/tex; mode=display">
+\min_\theta \max_\phi F(\theta,\phi) =  \mathbb{E}_{x \sim p_{\textrm{data}}}[T_\phi(\mathbf{x})] - \mathbb{E}_{x \sim p_{G_\theta}}[f^*(T_\phi(\mathbf{x}))]
+</script></div>
+
+<p>Intuitively, we can think about this objective as the generator trying to minimize the divergence estimate, while the discriminator tries to tighten the lower bound.</p>
+
+<h3 id="bigan">BiGAN</h3>
+<p>We won’t worry too much about the <a href="https://arxiv.org/abs/1605.09782">BiGAN</a> in these notes. However, we can think about this model as one that allows us to infer latent representations even within a GAN framework.</p>
+
+<h3 id="cyclegan">CycleGAN</h3>
+<p><a href="https://arxiv.org/abs/1703.10593">CycleGAN</a> is a type of GAN that allows us to do unsupervised image-to-image translation, from two domains <script type="math/tex">\mathcal{X} \leftrightarrow \mathcal{Y}</script>.</p>
+
+<p>Specifically, we learn two conditional generative models: <script type="math/tex">G: \mathcal{X} \leftrightarrow \mathcal{Y}</script> and <script type="math/tex">F: \mathcal{Y} \leftrightarrow \mathcal{X}</script>. There is a discriminator <script type="math/tex">D_\mathcal{Y}</script> associated with <script type="math/tex">G</script> that compares the true <script type="math/tex">Y</script> with the generated samples <script type="math/tex">\hat{Y} = G(X)</script>. Similarly, there is another discriminator <script type="math/tex">D_\mathcal{X}</script> associated with <script type="math/tex">F</script> that compares the true <script type="math/tex">X</script> with the generated samples <script type="math/tex">\hat{X} = F(Y)</script>. The figure below illustrates the CycleGAN setup:</p>
+
+<figure>
+<center><img src="cyclegan_gendisc.png" alt="drawing" width="300" class="center" /></center>
+<!-- <figcaption>
+Graphical model of generator $$G_\theta$$ and discriminator $$D_\phi$$.
+ </figcaption> -->
+</figure>
+
+<p>CycleGAN enforces a property known as <em>cycle consistency</em>, which states that if we can go from <script type="math/tex">X</script> to <script type="math/tex">\hat{Y}</script> via <script type="math/tex">G</script>, then we should also be able to go from <script type="math/tex">\hat{Y}</script> to <script type="math/tex">X</script> via <script type="math/tex">F</script>. The overall loss function can be written as:</p>
+
+<div class="mathblock"><script type="math/tex; mode=display">
+\min_{F, G, D_\mathcal{X}, D_\mathcal{Y}} \mathcal{L}_{GAN}(G, D_\mathcal{Y}, X, Y) + \mathcal{L}_{GAN}(F, D_\mathcal{X}, X, Y) + \lambda \left(\mathbb{E}_X [||F(G(X)) - X||_1] + \mathbb{E}_Y [||G(F(Y)) - Y||_1] \right)
+</script></div>
+
+<h1 id="footnotes">Footnotes</h1>
+<div class="footnotes">
+  <ol>
+    <li id="fn:1">
+      <p>In this context, convex means a line joining any two points that lies above the function. <a href="#fnref:1" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:2">
+      <p>The function value at any point <script type="math/tex">\mathbf{x}_0</script> is close to or greater than <script type="math/tex">f(\mathbf{x}_0)</script>. <a href="#fnref:2" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:3">
+      <p>This <a href="http://web.stanford.edu/~boyd/cvxbook/">book</a> is an excellent resource to learn more about these topics. <a href="#fnref:3" class="reversefootnote">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
+
+
+
+    </article>
+    <span class="print-footer">Generative Adversarial Networks - Aditya Grover</span>
+    <footer>
+  <hr class="slender">
+  <!-- <ul class="footer&#45;links"> -->
+  <!--   <li><a href="mailto:hate@spam.net"><span class="icon&#45;mail"></span></a></li>     -->
+  <!--    -->
+  <!--     <li> -->
+  <!--       <a href="//www.twitter.com/twitter_handle"><span class="icon-twitter"></span></a> -->
+  <!--     </li> -->
+  <!--    -->
+  <!--     <li> -->
+  <!--       <a href="//plus.google.com/+googlePlusName"><span class="icon-googleplus"></span></a> -->
+  <!--     </li> -->
+  <!--    -->
+  <!--     <li> -->
+  <!--       <a href="//github.com/GithubHandle"><span class="icon-github"></span></a> -->
+  <!--     </li> -->
+  <!--    -->
+  <!--     <li> -->
+  <!--       <a href="//www.flickr.com/photos/FlickrUserID"><span class="icon-flickr"></span></a> -->
+  <!--     </li> -->
+  <!--    -->
+  <!--     <li> -->
+  <!--       <a href="/feed"><span class="icon-feed"></span></a> -->
+  <!--     </li> -->
+  <!--      -->
+  <!-- </ul> -->
+<div class="credits">
+<!-- <span>&#38;copy; 2018 <!&#45;&#45; &#38;#38;nbsp;&#38;#38;nbsp;ADITYA GROVER &#45;&#45;></span></br> <br> -->
+<span>Site created with <a href="//jekyllrb.com">Jekyll</a> using the <a href="//github.com/clayh53/tufte-jekyll">Tufte theme</a>. &copy; 2018</span> 
+</div>  
+</footer>
+
+  </body>
+</html>
