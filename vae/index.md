@@ -142,7 +142,7 @@ In particular, the gap between the original objective(marginal log-likelihood $$
 In summary, we can learn a latent variable model by maximizing the ELBO with respect to both the model parameters $$\theta$$ and the variational parameters $$\lambda$$ for any given datapoint $$\bx$$
 {% math %}
 \begin{align}
-\max_{\theta \in \Theta} \sum_{\bx \in \D} \max_{\lambda \in \Lambda} \Expect_{q(\bz)} \left[\log \frac{p(\bx, \bz)}{q(\bz)}\right].
+\max_{\theta} \sum_{\bx \in \D} \max_{\lambda} \Expect_{q(\bz)} \left[\log \frac{p(\bx, \bz)}{q(\bz)}\right].
 \end{align}
 {% endmath %}
 
@@ -257,12 +257,12 @@ A noticable limitation of black-box variational inference is that **Step 1** exe
     \lambda^* = \argmax_{\lambda\in \Lambda} \ELBO(\bx; \theta, \lambda).
 \end{align}
 {% endmath %}
-For a given choice of $$\theta$$, there is a well-defined mapping from $$\bx \mapsto \lambda^\ast$$. A key realization is that this mapping can be *learned*. In particular, one can train an encoding function (parameterized by $$\phi \in \Phi$$) $$f_\phi: \X \to \Lambda$$ 
+For a given choice of $$\theta$$, there is a well-defined mapping from $$\bx \mapsto \lambda^\ast$$. A key realization is that this mapping can be *learned*. In particular, one can train an encoding function (parameterized by $$\phi$$) $$f_\phi: \X \to \Lambda$$ 
 (where $$\Lambda$$ is the space of $$\lambda$$ parameters) 
 on the following objective
 {% math %}
 \begin{align}
-    \max_{\phi \in \Phi} \sum_{\bx \in \D} \ELBO(\bx; \theta, f_\phi(\bx)).
+    \max_{\phi } \sum_{\bx \in \D} \ELBO(\bx; \theta, f_\phi(\bx)).
 \end{align}
 {% endmath %}
 It is worth noting at this point that $$f_\phi(\bx)$$ can be interpreted as defining the conditional distribution $$q_\phi(\bz \giv \bx)$$. With a slight abuse of notation, we define
@@ -274,7 +274,7 @@ It is worth noting at this point that $$f_\phi(\bx)$$ can be interpreted as defi
 and rewrite the optimization problem as 
 {% math %}
 \begin{align}
-    \max_{\phi \in \Phi} \sum_{\bx \in \D} \ELBO(\bx; \theta, \phi).
+    \max_{\phi } \sum_{\bx \in \D} \ELBO(\bx; \theta, \phi).
 \end{align}
 {% endmath %}
 It is also worth noting that optimizing $$\phi$$ over the entire dataset as a *subroutine* everytime we sample a new mini-batch is clearly not reasonable. However, if we believe that $$f_\phi$$ is capable of quickly adapting to a close-enough approximation of $$\lambda^\ast$$ given the current choice of $$\theta$$, then we can interleave the optimization $$\phi$$ and $$\theta$$. The yields the following procedure, where for each mini-batch $$\M = \set{\bx^{(1)}, \ldots, \bx^{(m)}}$$, we perform the following two updates jointly

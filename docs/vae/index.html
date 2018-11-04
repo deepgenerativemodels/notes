@@ -209,7 +209,7 @@ Illustration for the KL divergence gap between the marginal log-likelihood \(\lo
 <p>In summary, we can learn a latent variable model by maximizing the ELBO with respect to both the model parameters <script type="math/tex">\theta</script> and the variational parameters <script type="math/tex">\lambda</script> for any given datapoint <script type="math/tex">\bx</script></p>
 <div class="mathblock"><script type="math/tex; mode=display">
 \begin{align}
-\max_{\theta \in \Theta} \sum_{\bx \in \D} \max_{\lambda \in \Lambda} \Expect_{q(\bz)} \left[\log \frac{p(\bx, \bz)}{q(\bz)}\right].
+\max_{\theta} \sum_{\bx \in \D} \max_{\lambda} \Expect_{q(\bz)} \left[\log \frac{p(\bx, \bz)}{q(\bz)}\right].
 \end{align}
 </script></div>
 
@@ -313,7 +313,7 @@ In the case where <script type="math/tex">p_\theta(\bx \giv \bz)</script> is a G
 <p>A noticable limitation of black-box variational inference is that <strong>Step 1</strong> executes an optimization subroutine that is computationally expensive. Recall that the goal of the <strong>Step 1</strong> is to find</p>
 <div class="mathblock"><script type="math/tex; mode=display">
 \begin{align}
-    \lambda^* = \argmax_{\lambda} \ELBO(\bx; \theta, \lambda).
+    \lambda^* = \argmax_{\lambda\in \Lambda} \ELBO(\bx; \theta, \lambda).
 \end{align}
 </script></div>
 <p>For a given choice of <script type="math/tex">\theta</script>, there is a well-defined mapping from <script type="math/tex">\bx \mapsto \lambda^\ast</script>. A key realization is that this mapping can be <em>learned</em>. In particular, one can train an encoding function (parameterized by <script type="math/tex">\phi</script>) <script type="math/tex">f_\phi: \X \to \Lambda</script> 
@@ -321,7 +321,7 @@ In the case where <script type="math/tex">p_\theta(\bx \giv \bz)</script> is a G
 on the following objective</p>
 <div class="mathblock"><script type="math/tex; mode=display">
 \begin{align}
-    \max_{\phi} \sum_{\bx \in \D} \ELBO(\bx; \theta, f_\phi(\bx)).
+    \max_{\phi } \sum_{\bx \in \D} \ELBO(\bx; \theta, f_\phi(\bx)).
 \end{align}
 </script></div>
 <p>It is worth noting at this point that <script type="math/tex">f_\phi(\bx)</script> can be interpreted as defining the conditional distribution <script type="math/tex">q_\phi(\bz \giv \bx)</script>. With a slight abuse of notation, we define</p>
@@ -333,7 +333,7 @@ on the following objective</p>
 <p>and rewrite the optimization problem as</p>
 <div class="mathblock"><script type="math/tex; mode=display">
 \begin{align}
-    \max_{\phi} \sum_{\bx \in \D} \ELBO(\bx; \theta, \phi).
+    \max_{\phi } \sum_{\bx \in \D} \ELBO(\bx; \theta, \phi).
 \end{align}
 </script></div>
 <p>It is also worth noting that optimizing <script type="math/tex">\phi</script> over the entire dataset as a <em>subroutine</em> everytime we sample a new mini-batch is clearly not reasonable. However, if we believe that <script type="math/tex">f_\phi</script> is capable of quickly adapting to a close-enough approximation of <script type="math/tex">\lambda^\ast</script> given the current choice of <script type="math/tex">\theta</script>, then we can interleave the optimization <script type="math/tex">\phi</script> and <script type="math/tex">\theta</script>. The yields the following procedure, where for each mini-batch <script type="math/tex">\M = \set{\bx^{(1)}, \ldots, \bx^{(m)}}</script>, we perform the following two updates jointly</p>
