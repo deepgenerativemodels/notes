@@ -15,7 +15,7 @@ You too may help make these notes better by submitting your improvements to us v
 
 3. [Variational Autoencoders](vae/) <!-- Coming soon! -->
 
-4. [Normalizing Flow Models] Coming soon!
+4. [Normalizing Flow Models](flow/)
 
 5. [Generative Adversarial Networks](gans/)
 
