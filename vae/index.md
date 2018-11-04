@@ -142,7 +142,7 @@ In particular, the gap between the original objective(marginal log-likelihood $$
 In summary, we can learn a latent variable model by maximizing the ELBO with respect to both the model parameters $$\theta$$ and the variational parameters $$\lambda$$ for any given datapoint $$\bx$$
 {% math %}
 \begin{align}
-\max_{\theta} \sum_{\bx \in \D} \max_{\lambda} \Expect_{q(\bz)} \left[\log \frac{p(\bx, \bz)}{q(\bz)}\right].
+\max_{\theta} \sum_{\bx \in \D} \max_{\lambda} \Expect_{q_\lambda(\bz)} \left[\log \frac{p_\theta(\bx, \bz)}{q_\lambda(\bz)}\right].
 \end{align}
 {% endmath %}
 

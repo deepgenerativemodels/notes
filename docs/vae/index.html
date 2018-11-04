@@ -209,7 +209,7 @@ Illustration for the KL divergence gap between the marginal log-likelihood \(\lo
 <p>In summary, we can learn a latent variable model by maximizing the ELBO with respect to both the model parameters <script type="math/tex">\theta</script> and the variational parameters <script type="math/tex">\lambda</script> for any given datapoint <script type="math/tex">\bx</script></p>
 <div class="mathblock"><script type="math/tex; mode=display">
 \begin{align}
-\max_{\theta} \sum_{\bx \in \D} \max_{\lambda} \Expect_{q(\bz)} \left[\log \frac{p(\bx, \bz)}{q(\bz)}\right].
+\max_{\theta} \sum_{\bx \in \D} \max_{\lambda} \Expect_{q_\lambda(\bz)} \left[\log \frac{p_\theta(\bx, \bz)}{q_\lambda(\bz)}\right].
 \end{align}
 </script></div>
 
