@@ -11,7 +11,7 @@ title: Variational Autoencoders
 \newcommand{\Z}{\mathcal{Z}}
 \newcommand{\Q}{\mathcal{Q}}
 \newcommand{\bx}{\mathbf{x}}
-\newcommand{\M}{\mathcal{M}}
+\newcommand{\M}{\mathcal{B}}
 \newcommand{\ELBO}{\mathrm{ELBO}}
 \newcommand{\bz}{\mathbf{z}}
 \newcommand{\giv}{\mid}
@@ -87,17 +87,17 @@ One way to measure how closely $$p(\bx, \bz)$$ fits the observed dataset $$\D$$ 
 As we have seen previously, optimizing an empirical estimate of the KL divergence is equivalent to maximizing the marginal log-likelihood $$\log p(\bz)$$ over $$\D$$
 {% math %}
 \begin{align}
-\max_{p \in \P_{\bx, \bz}} \sum_{\bx \in \D} \log p(\bx) = \sum_{\bx \in \D} \int p(\bx, \bz) \d \bz.
+\max_{p \in \P_{\bx, \bz}} \sum_{\bx \in \D} \log p(\bx) = \sum_{\bx \in \D} \log\int p(\bx, \bz) \d \bz.
 \end{align}
 {% endmath %}
 
 However, it turns out this problem is generally intractable for high-dimensional $$\bz$$ as it involves an integration (or sums in the case $$\bz$$ is discrete) over all the possible latent sources of variation $$\bz$$. One option is to estimate the objective via Monte Carlo. For any given datapoint $$\bf x$$, we can obtain the following estimate for its marginal log-likelihood
 
 {% math %}
-\log p(\bx) \approx \frac{1}{k} \sum_{i=1}^k \log p(\bx \vert \bz^{(i)})
+\log p(\bx) \approx \log \frac{1}{k} \sum_{i=1}^k p(\bx \vert \bz^{(i)}) \text{, where } \bz^{(i)} \sim p(\bz)
 {% endmath %}
 
-In practice however, the above estimate however has high variance and is not optimized in practice. 
+In practice however, optimizing the above estimate suffers from high variance in gradient estimates. 
 
 
 Rather than maximizing the log-likelihood directly, an alternate is to instead construct a lower bound that is more amenable to optimization. To do so, we note that evaluating the marginal likelihood $$p(\bx)$$ is at least as difficult as as evaluating the posterior $$p(\bz \mid \bx)$$ for any latent vector $$\bz$$ since by definition $$p(\bz \mid \bx) = p(\bx, \bz) / p(\bx)$$. 
@@ -108,14 +108,13 @@ Next, we introduce a variational family $$\Q$$ of distributions that approximate
 
 Given $$\P_{\bx, \bz}$$ and $$\Q$$, we note that the following relationships hold true[^2] for any $$\bx$$ and all variational distributions $$q_\lambda(\bz) \in \Q$$
 
-
-
 {% math %}
 \begin{align}
 \log p_\theta(\bx) &= \log \int p_\theta(\bx, \bz) \d \bz \\
 &= \log \int \frac{q_\lambda(\bz)}{q_\lambda(\bz)} p(\bx, \bz) \d \bz\\
 &\ge\int q_\lambda(\bz) \log \frac{p_\theta(\bx, \bz)}{q_\lambda(\bz)} \d \bz \\
-&= \Expect_{q_\lambda(\bz)} \left[\log \frac{p_\theta(\bx, \bz)}{q_\lambda(\bz)}\right],
+&= \Expect_{q_\lambda(\bz)} \left[\log \frac{p_\theta(\bx, \bz)}{q_\lambda(\bz)}\right] \\
+&:=\ELBO(\bx; \theta, \lambda)
 \end{align}
 {% endmath %}
 where we have used Jensen's inequality in the final step. The Evidence Lower Bound or ELBO in short admits a tractable unbiased Monte Carlo estimator
@@ -154,9 +153,9 @@ In summary, we can learn a latent variable model by maximizing the ELBO with res
 Black-Box Variational Inference
 ==============
 
-In this post, we shall focus on first-order stochastic gradient methods for optimizing the ELBO. These optimization techniques are desirable in that they allow us to sub-sample the dataset during optimization---but require our objective function to be differentiable with respect to the optimization variables. As such, we shall posit for now that any $$p(\bx, \bz) \in \P_{\bx, \bz}$$ and $$q(\bz) \in \Q$$ are alternatively parameterizable as $$p_\theta(\bx, \bz)$$ and $$q_\lambda(\bz)$$ and that these distributions are differentiable with respect to $$\theta$$ and $$\lambda$$.
-
-This inspires an Expectation-Maximization-like algorithm, where, for each mini-batch $$\M = \set{\bx^{(1)}, \ldots, \bx^{(m)}}$$, the following two steps are performed.
+In this post, we shall focus on first-order stochastic gradient methods for optimizing the ELBO. These optimization techniques are desirable in that they allow us to sub-sample the dataset during optimization---but require our objective function to be differentiable with respect to the optimization variables. 
+<!-- As such, we shall posit for now that any $$p(\bx, \bz) \in \P_{\bx, \bz}$$ and $$q(\bz) \in \Q$$ are alternatively parameterizable as $$p_\theta(\bx, \bz)$$ and $$q_\lambda(\bz)$$ and that these distributions are differentiable with respect to $$\theta$$ and $$\lambda$$. -->
+This inspires Black-Box Variational Inference (BBVI), a general-purpose Expectation-Maximization-like algorithm for variational learning of latent variable models, where, for each mini-batch $$\M = \set{\bx^{(1)}, \ldots, \bx^{(m)}}$$, the following two steps are performed.
 
 **Step 1**
 
@@ -166,7 +165,7 @@ We first do *per-sample* optimization of $$q$$ by iteratively applying the updat
 \lambda^{(i)} \gets \lambda^{(i)} + \tilde{\nabla}_\lambda \ELBO(\bx^{(i)}; \theta, \lambda^{(i)}),
 \end{align}
 {% endmath %}
-where $$\text{ELBO}(\bx; \theta, \lambda) = \Expect_{q_\lambda(\bz)} \log \frac{p_\theta(\bx, \bz)}{q_\lambda(\bz)}$$, and $$\tilde{\nabla}_\lambda$$ denotes an unbiased estimate of the ELBO gradient. This step seeks to approximate the log-likelihood $$\log p_\theta(\bx^{(i)})$$.
+where $$\text{ELBO}(\bx; \theta, \lambda) = \Expect_{q_\lambda(\bz)} \left[\log \frac{p_\theta(\bx, \bz)}{q_\lambda(\bz)}\right]$$, and $$\tilde{\nabla}_\lambda$$ denotes an unbiased estimate of the ELBO gradient. This step seeks to approximate the log-likelihood $$\log p_\theta(\bx^{(i)})$$.
 
 **Step 2**
 
@@ -178,13 +177,13 @@ We then perform a single update step based on the mini-batch
 {% endmath %}
 which corresponds to the step that hopefully moves $$p_\theta$$ closer to $$p_{\mathrm{data}}$$.
 
-A Note on Gradient Estimation
+Gradient Estimation
 ==============
 
 The gradients $$\nabla_\lambda \ELBO$$ and $$\nabla_\theta \ELBO$$ can be estimated via Monte Carlo sampling. While it is straightforward to construct an unbiased estimate of $$\nabla_\theta \ELBO$$ by simply pushing $$\nabla_\theta$$ through the expectation operator, the same cannot be said for $$\nabla_\lambda$$. Instead, we see that
 {% math %}
 \begin{align}
-\nabla_\lambda \Expect_{q_\lambda(\bz)} \log \frac{p_\theta(\bx, \bz)}{q_\lambda(\bz)} = \Expect_{q_\lambda(\bz)} \brac{\paren{\log \frac{p_\theta(\bx, \bz)}{q_\lambda(\bz)}} \cdot \nabla_\lambda \log q_\lambda(\bz)}.
+\nabla_\lambda \Expect_{q_\lambda(\bz)} \left[\log \frac{p_\theta(\bx, \bz)}{q_\lambda(\bz)} \right]= \Expect_{q_\lambda(\bz)} \brac{\paren{\log \frac{p_\theta(\bx, \bz)}{q_\lambda(\bz)}} \cdot \nabla_\lambda \log q_\lambda(\bz)}.
 \end{align}
 {% endmath %}
 This equality follows from the log-derivative trick (also commonly referred to as the REINFORCE trick). The full derivation involves some simple algebraic manipulations and is left as an exercise for the reader. The gradient estimator $$\tilde{\nabla}_\lambda \ELBO$$ is thus
@@ -193,23 +192,23 @@ This equality follows from the log-derivative trick (also commonly referred to a
 \frac{1}{k}\sum_{i=1}^k \brac{\paren{\log \frac{p_\theta(\bx, \bz^{(i)})}{q_\lambda(\bz^{(i)})}} \cdot \nabla_\lambda \log q_\lambda(\bz^{(i)})} \text{, where } \bz^{(i)} \sim q_\lambda(\bz).
 \end{align}
 {% endmath %}
-However, it is often noted that this estimator suffers from high variance. One of the key contributions of the variational autoencoder paper is the reparameterization trick, which introduces an auxiliary distribution $$p(\veps)$$ and a differentiable function $$T(\veps; \lambda)$$ such that the procedure
+However, it is often noted that this estimator suffers from high variance. One of the key contributions of the variational autoencoder paper is the reparameterization trick, which introduces a fixed, auxiliary distribution $$p(\veps)$$ and a differentiable function $$T(\veps; \lambda)$$ such that the procedure
 {% math %}
 \begin{align}
 \veps &\sim p(\veps)\\
 \bz &\gets T(\veps; \lambda),
 \end{align}
 {% endmath %}
-is equivalent to sampling from $$q_\lambda(\bz)$$. By the Law of the Unconscious Statistician, we can see that
+is equivalent to sampling from $$q_\lambda(\bz)$$. By the [Law of the Unconscious Statistician](https://en.wikipedia.org/wiki/Law_of_the_unconscious_statistician), we can see that
 {% math %}
 \begin{align}
-\nabla_\lambda \Expect_{q_\lambda(\bz)} \log \frac{p_\theta(\bx, \bz)}{q_\lambda(\bz)} = \Expect_{p(\veps)} \nabla_\lambda \log \frac{p_\theta(\bx, T(\veps; \lambda))}{q_\lambda(T(\veps; \lambda))}.
+\nabla_\lambda \Expect_{q_\lambda(\bz)} \left[\log \frac{p_\theta(\bx, \bz)}{q_\lambda(\bz)}\right] = \Expect_{p(\veps)} \left[\nabla_\lambda \log \frac{p_\theta(\bx, T(\veps; \lambda))}{q_\lambda(T(\veps; \lambda))}\right].
 \end{align}
 {% endmath %}
 In contrast to the REINFORCE trick, the reparameterization trick is often noted empirically to have lower variance and thus results in more stable training. 
 <!-- \rs{I think there exists pathological examples where REINFORCE has lower variance than reparamterization. Should we talk about that?} -->
 
-Deep Generative Model Parameterization
+Parameterizing Distributions via Deep Neural Networks
 ============== 
 
 So far, we have described $$p_\theta(\bx, \bz)$$ and $$q_\lambda(\bz)$$ in the abstract. To instantiate these objects, we consider choices of parametric distributions for $$p_\theta(\bz)$$, $$p_\theta(\bx \giv \bz)$$, and $$q_\lambda(\bz)$$. A popular choice for $$p_\theta(\bz)$$ is the unit Gaussian
@@ -218,23 +217,27 @@ So far, we have described $$p_\theta(\bx, \bz)$$ and $$q_\lambda(\bz)$$ in the a
 p_\theta(\bz) = \Normal(\bz \giv \0, \I).
 \end{align}
 {% endmath %}
-An popular alternative is a mixture of Gaussians with trainable mean and covariance parameters. 
+in which case $$\theta$$ is simply the empty set since the prior is a fixed distribution. Another alternative often used in practice is a mixture of Gaussians with trainable mean and covariance parameters. 
 
-The conditional distribution $$p_\theta(\bx \giv \bz)$$ is where we introduce a deep neural network. We note that a conditional distribution can be constructed by defining a distribution family (parameterized by $$\omega \in \Omega$$) in the target space $$\bx$$ (i.e. $$p_\omega(\bx)$$ defines an unconditional distribution over $$\bx$$) and a mapping function $$g_\theta: \Z \to \Omega$$. It is natural to call $$g_\theta$$ the decoder that is parameterized by $$\theta$$. The act of conditioning on $$\bz$$ is thus equivalent to using the choice of $$\omega = g(\bz)$$.In other words, $$g_\theta$$ defines the conditional distribution
+The conditional distribution $$p_\theta(\bx \giv \bz)$$ is where we introduce a deep neural network. We note that a conditional distribution can be constructed by defining a distribution family (parameterized by $$\omega \in \Omega$$) in the target space $$\bx$$ (i.e. $$p_\omega(\bx)$$ defines an unconditional distribution over $$\bx$$) and a mapping function $$g_\theta: \Z \to \Omega$$. 
+<!-- It is natural to call $$g_\theta$$ the decoder that is parameterized by $$\theta$$. The act of conditioning on $$\bz$$ is thus equivalent to using the choice of $$\omega = g(\bz)$$. --> 
+In other words, $$g_\theta(\cdot)$$ defines the conditional distribution
 {% math %}
 \begin{align}
     p_\theta(\bx \giv \bz) = p_\omega(\bx) \text{ , where } \omega = g_\theta(\bz).
 \end{align}
 {% endmath %}
-The generative model $$p_\theta(\bx, \bz)$$ is called a *deep* generative model since we will be using a neural network to instantiate the function $$g_\theta$$. In the case where $$p_\theta(\bx \giv \bz)$$ is a Gaussian distribution, we can thus represent it as
+The function $$g_\theta$$ is also referred to as the decoding distribution since it maps a latent *code* $$\bz$$ to the parameters of a distribution over observed variables $$\bx$$. In practice, it is typical to specify $$g_\theta$$ as a deep neural network.  
+<!-- The generative model $$p_\theta(\bx, \bz)$$ is called a *deep* generative model since we will be using a neural network to instantiate the function $$g_\theta$$.  -->
+In the case where $$p_\theta(\bx \giv \bz)$$ is a Gaussian distribution, we can thus represent it as
 {% math %}
 \begin{align}
     p_\theta(\bx \giv \bz) = \Normal(\bx \giv \mu_\theta(\bz), \Sigma_\theta(\bz)),
 \end{align}
 {% endmath %}
-where $$\mu_\theta(\bz)$$ and $$\Sigma_\theta(\bz)$$ are neural networks that propose the mean and covariance matrix for the Gaussian distribution over $$\bx$$ when conditioned on $$\bz$$.
+where $$\mu_\theta(\bz)$$ and $$\Sigma_\theta(\bz)$$ are neural networks that specify the mean and covariance matrix for the Gaussian distribution over $$\bx$$ when conditioned on $$\bz$$.
 
-Finally, the variational family for the proposal distribution $$q_\lambda(\bz)$$ needs to be chosen judiciously so that the reparameterization trick is possible. Once again, a popular choice is the Gaussian distribution, where
+Finally, the variational family for the proposal distribution $$q_\lambda(\bz)$$ needs to be chosen judiciously so that the reparameterization trick is possible. Many continuous distributions in the [location-scale family](https://en.wikipedia.org/wiki/Location%E2%80%93scale_family) can be reparameterized. In practice, a popular choice is again the Gaussian distribution, where
 {% math %}
 \begin{align}
     \lambda &= (\mu, \Sigma) \\
@@ -254,7 +257,9 @@ A noticable limitation of black-box variational inference is that **Step 1** exe
     \lambda^* = \argmax_{\lambda} \ELBO(\bx; \theta, \lambda).
 \end{align}
 {% endmath %}
-For a given choice of $$\theta$$, there is a well-defined mapping from $$\bx \mapsto \lambda^*$$. A key realization is that this mapping can be *learned*. In particular, one can train an encoding function (parameterized by $$\phi$$) $$f_\phi: \X \to \Lambda$$ (where $$\Lambda$$ is the space of $$\lambda$$ parameters) on the following objective
+For a given choice of $$\theta$$, there is a well-defined mapping from $$\bx \mapsto \lambda^\ast$$. A key realization is that this mapping can be *learned*. In particular, one can train an encoding function (parameterized by $$\phi$$) $$f_\phi: \X \to \Lambda$$ 
+(where $$\Lambda$$ is the space of $$\lambda$$ parameters) 
+on the following objective
 {% math %}
 \begin{align}
     \max_{\phi} \sum_{\bx \in \D} \ELBO(\bx; \theta, f_\phi(\bx)).
@@ -263,7 +268,7 @@ For a given choice of $$\theta$$, there is a well-defined mapping from $$\bx \ma
 It is worth noting at this point that $$f_\phi(\bx)$$ can be interpreted as defining the conditional distribution $$q_\phi(\bz \giv \bx)$$. With a slight abuse of notation, we define
 {% math %}
 \begin{align}
-    \ELBO(\bx; \theta, \phi) = \Expect_{q_\phi(\bz \mid \bx)} \log \frac{p_\theta(\bx, \bz)}{q_\phi(\bz \giv \bx)}.
+    \ELBO(\bx; \theta, \phi) = \Expect_{q_\phi(\bz \mid \bx)} \left[\log \frac{p_\theta(\bx, \bz)}{q_\phi(\bz \giv \bx)}\right].
 \end{align}
 {% endmath %}
 and rewrite the optimization problem as 
@@ -272,14 +277,14 @@ and rewrite the optimization problem as
     \max_{\phi} \sum_{\bx \in \D} \ELBO(\bx; \theta, \phi).
 \end{align}
 {% endmath %}
-It is also worth noting that optimizing $$\phi$$ over the entire dataset as a *subroutine* everytime we sample a new mini-batch is clearly not reasonable. However, if we believe that $$f_\phi$$ is capable of quickly adapting to always give a close-enough approximation of $$\lambda^*$$ given the current choice of $$\theta$$, then we can interleave the optimization $$\phi$$ and $$\theta$$. The yields the following procedure, where for each mini-batch $$\M = \set{\bx^{(1)}, \ldots, \bx^{(m)}}$$, we perform the following two updates jointly
+It is also worth noting that optimizing $$\phi$$ over the entire dataset as a *subroutine* everytime we sample a new mini-batch is clearly not reasonable. However, if we believe that $$f_\phi$$ is capable of quickly adapting to a close-enough approximation of $$\lambda^\ast$$ given the current choice of $$\theta$$, then we can interleave the optimization $$\phi$$ and $$\theta$$. The yields the following procedure, where for each mini-batch $$\M = \set{\bx^{(1)}, \ldots, \bx^{(m)}}$$, we perform the following two updates jointly
 {% math %}
 \begin{align}
     \phi &\gets \phi + \tilde{\nabla}_\phi \sum_{\bx \in \M} \ELBO(\bx; \theta, \phi) \\
     \theta &\gets \theta + \tilde{\nabla}_\theta \sum_{\bx \in \M} \ELBO(\bx; \theta, \phi),
 \end{align}
 {% endmath %}
-rather than running BBVI's **Step 1** as a subroutine. By leveraging the learnability of $$\bx \mapsto \lambda^*$$, this optimization procedure amortizes the cost of variational inference. If one further chooses to define $$f_\phi$$ as a neural network, the result is the variational autoencoder.
+rather than running BBVI's **Step 1** as a subroutine. By leveraging the learnability of $$\bx \mapsto \lambda^\ast$$, this optimization procedure amortizes the cost of variational inference. If one further chooses to define $$f_\phi$$ as a neural network, the result is the variational autoencoder.
 
 
 Footnotes

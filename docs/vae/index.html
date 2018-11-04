@@ -85,7 +85,7 @@
 \newcommand{\Z}{\mathcal{Z}}
 \newcommand{\Q}{\mathcal{Q}}
 \newcommand{\bx}{\mathbf{x}}
-\newcommand{\M}{\mathcal{M}}
+\newcommand{\M}{\mathcal{B}}
 \newcommand{\ELBO}{\mathrm{ELBO}}
 \newcommand{\bz}{\mathbf{z}}
 \newcommand{\giv}{\mid}
@@ -160,17 +160,17 @@ p_\theta(\bx, \bz) = p(\bx \giv \bz)p(\bz).
 <p>As we have seen previously, optimizing an empirical estimate of the KL divergence is equivalent to maximizing the marginal log-likelihood <script type="math/tex">\log p(\bz)</script> over <script type="math/tex">\D</script></p>
 <div class="mathblock"><script type="math/tex; mode=display">
 \begin{align}
-\max_{p \in \P_{\bx, \bz}} \sum_{\bx \in \D} \log p(\bx) = \sum_{\bx \in \D} \int p(\bx, \bz) \d \bz.
+\max_{p \in \P_{\bx, \bz}} \sum_{\bx \in \D} \log p(\bx) = \sum_{\bx \in \D} \log\int p(\bx, \bz) \d \bz.
 \end{align}
 </script></div>
 
 <p>However, it turns out this problem is generally intractable for high-dimensional <script type="math/tex">\bz</script> as it involves an integration (or sums in the case <script type="math/tex">\bz</script> is discrete) over all the possible latent sources of variation <script type="math/tex">\bz</script>. One option is to estimate the objective via Monte Carlo. For any given datapoint <script type="math/tex">\bf x</script>, we can obtain the following estimate for its marginal log-likelihood</p>
 
 <div class="mathblock"><script type="math/tex; mode=display">
-\log p(\bx) \approx \frac{1}{k} \sum_{i=1}^k \log p(\bx \vert \bz^{(i)})
+\log p(\bx) \approx \log \frac{1}{k} \sum_{i=1}^k p(\bx \vert \bz^{(i)}) \text{, where } \bz^{(i)} \sim p(\bz)
 </script></div>
 
-<p>In practice however, the above estimate however has high variance and is not optimized in practice.</p>
+<p>In practice however, optimizing the above estimate suffers from high variance in gradient estimates.</p>
 
 <p>Rather than maximizing the log-likelihood directly, an alternate is to instead construct a lower bound that is more amenable to optimization. To do so, we note that evaluating the marginal likelihood <script type="math/tex">p(\bx)</script> is at least as difficult as as evaluating the posterior <script type="math/tex">p(\bz \mid \bx)</script> for any latent vector <script type="math/tex">\bz</script> since by definition <script type="math/tex">p(\bz \mid \bx) = p(\bx, \bz) / p(\bx)</script>.</p>
 
@@ -183,7 +183,8 @@ p_\theta(\bx, \bz) = p(\bx \giv \bz)p(\bz).
 \log p_\theta(\bx) &= \log \int p_\theta(\bx, \bz) \d \bz \\
 &= \log \int \frac{q_\lambda(\bz)}{q_\lambda(\bz)} p(\bx, \bz) \d \bz\\
 &\ge\int q_\lambda(\bz) \log \frac{p_\theta(\bx, \bz)}{q_\lambda(\bz)} \d \bz \\
-&= \Expect_{q_\lambda(\bz)} \left[\log \frac{p_\theta(\bx, \bz)}{q_\lambda(\bz)}\right],
+&= \Expect_{q_\lambda(\bz)} \left[\log \frac{p_\theta(\bx, \bz)}{q_\lambda(\bz)}\right] \\
+&:=\ELBO(\bx; \theta, \lambda)
 \end{align}
 </script></div>
 <p>where we have used Jensen’s inequality in the final step. The Evidence Lower Bound or ELBO in short admits a tractable unbiased Monte Carlo estimator</p>
@@ -214,9 +215,9 @@ Illustration for the KL divergence gap between the marginal log-likelihood \(\lo
 
 <h1 id="black-box-variational-inference">Black-Box Variational Inference</h1>
 
-<p>In this post, we shall focus on first-order stochastic gradient methods for optimizing the ELBO. These optimization techniques are desirable in that they allow us to sub-sample the dataset during optimization—but require our objective function to be differentiable with respect to the optimization variables. As such, we shall posit for now that any <script type="math/tex">p(\bx, \bz) \in \P_{\bx, \bz}</script> and <script type="math/tex">q(\bz) \in \Q</script> are alternatively parameterizable as <script type="math/tex">p_\theta(\bx, \bz)</script> and <script type="math/tex">q_\lambda(\bz)</script> and that these distributions are differentiable with respect to <script type="math/tex">\theta</script> and <script type="math/tex">\lambda</script>.</p>
-
-<p>This inspires an Expectation-Maximization-like algorithm, where, for each mini-batch <script type="math/tex">\M = \set{\bx^{(1)}, \ldots, \bx^{(m)}}</script>, the following two steps are performed.</p>
+<p>In this post, we shall focus on first-order stochastic gradient methods for optimizing the ELBO. These optimization techniques are desirable in that they allow us to sub-sample the dataset during optimization—but require our objective function to be differentiable with respect to the optimization variables. 
+<!-- As such, we shall posit for now that any $$p(\bx, \bz) \in \P_{\bx, \bz}$$ and $$q(\bz) \in \Q$$ are alternatively parameterizable as $$p_\theta(\bx, \bz)$$ and $$q_\lambda(\bz)$$ and that these distributions are differentiable with respect to $$\theta$$ and $$\lambda$$. -->
+This inspires Black-Box Variational Inference (BBVI), a general-purpose Expectation-Maximization-like algorithm for variational learning of latent variable models, where, for each mini-batch <script type="math/tex">\M = \set{\bx^{(1)}, \ldots, \bx^{(m)}}</script>, the following two steps are performed.</p>
 
 <p><strong>Step 1</strong></p>
 
@@ -226,7 +227,7 @@ Illustration for the KL divergence gap between the marginal log-likelihood \(\lo
 \lambda^{(i)} \gets \lambda^{(i)} + \tilde{\nabla}_\lambda \ELBO(\bx^{(i)}; \theta, \lambda^{(i)}),
 \end{align}
 </script></div>
-<p>where <script type="math/tex">\text{ELBO}(\bx; \theta, \lambda) = \Expect_{q_\lambda(\bz)} \log \frac{p_\theta(\bx, \bz)}{q_\lambda(\bz)}</script>, and <script type="math/tex">\tilde{\nabla}_\lambda</script> denotes an unbiased estimate of the ELBO gradient. This step seeks to approximate the log-likelihood <script type="math/tex">\log p_\theta(\bx^{(i)})</script>.</p>
+<p>where <script type="math/tex">\text{ELBO}(\bx; \theta, \lambda) = \Expect_{q_\lambda(\bz)} \left[\log \frac{p_\theta(\bx, \bz)}{q_\lambda(\bz)}\right]</script>, and <script type="math/tex">\tilde{\nabla}_\lambda</script> denotes an unbiased estimate of the ELBO gradient. This step seeks to approximate the log-likelihood <script type="math/tex">\log p_\theta(\bx^{(i)})</script>.</p>
 
 <p><strong>Step 2</strong></p>
 
@@ -238,12 +239,12 @@ Illustration for the KL divergence gap between the marginal log-likelihood \(\lo
 </script></div>
 <p>which corresponds to the step that hopefully moves <script type="math/tex">p_\theta</script> closer to <script type="math/tex">p_{\mathrm{data}}</script>.</p>
 
-<h1 id="a-note-on-gradient-estimation">A Note on Gradient Estimation</h1>
+<h1 id="gradient-estimation">Gradient Estimation</h1>
 
 <p>The gradients <script type="math/tex">\nabla_\lambda \ELBO</script> and <script type="math/tex">\nabla_\theta \ELBO</script> can be estimated via Monte Carlo sampling. While it is straightforward to construct an unbiased estimate of <script type="math/tex">\nabla_\theta \ELBO</script> by simply pushing <script type="math/tex">\nabla_\theta</script> through the expectation operator, the same cannot be said for <script type="math/tex">\nabla_\lambda</script>. Instead, we see that</p>
 <div class="mathblock"><script type="math/tex; mode=display">
 \begin{align}
-\nabla_\lambda \Expect_{q_\lambda(\bz)} \log \frac{p_\theta(\bx, \bz)}{q_\lambda(\bz)} = \Expect_{q_\lambda(\bz)} \brac{\paren{\log \frac{p_\theta(\bx, \bz)}{q_\lambda(\bz)}} \cdot \nabla_\lambda \log q_\lambda(\bz)}.
+\nabla_\lambda \Expect_{q_\lambda(\bz)} \left[\log \frac{p_\theta(\bx, \bz)}{q_\lambda(\bz)} \right]= \Expect_{q_\lambda(\bz)} \brac{\paren{\log \frac{p_\theta(\bx, \bz)}{q_\lambda(\bz)}} \cdot \nabla_\lambda \log q_\lambda(\bz)}.
 \end{align}
 </script></div>
 <p>This equality follows from the log-derivative trick (also commonly referred to as the REINFORCE trick). The full derivation involves some simple algebraic manipulations and is left as an exercise for the reader. The gradient estimator <script type="math/tex">\tilde{\nabla}_\lambda \ELBO</script> is thus</p>
@@ -252,23 +253,23 @@ Illustration for the KL divergence gap between the marginal log-likelihood \(\lo
 \frac{1}{k}\sum_{i=1}^k \brac{\paren{\log \frac{p_\theta(\bx, \bz^{(i)})}{q_\lambda(\bz^{(i)})}} \cdot \nabla_\lambda \log q_\lambda(\bz^{(i)})} \text{, where } \bz^{(i)} \sim q_\lambda(\bz).
 \end{align}
 </script></div>
-<p>However, it is often noted that this estimator suffers from high variance. One of the key contributions of the variational autoencoder paper is the reparameterization trick, which introduces an auxiliary distribution <script type="math/tex">p(\veps)</script> and a differentiable function <script type="math/tex">T(\veps; \lambda)</script> such that the procedure</p>
+<p>However, it is often noted that this estimator suffers from high variance. One of the key contributions of the variational autoencoder paper is the reparameterization trick, which introduces a fixed, auxiliary distribution <script type="math/tex">p(\veps)</script> and a differentiable function <script type="math/tex">T(\veps; \lambda)</script> such that the procedure</p>
 <div class="mathblock"><script type="math/tex; mode=display">
 \begin{align}
 \veps &\sim p(\veps)\\
 \bz &\gets T(\veps; \lambda),
 \end{align}
 </script></div>
-<p>is equivalent to sampling from <script type="math/tex">q_\lambda(\bz)</script>. By the Law of the Unconscious Statistician, we can see that</p>
+<p>is equivalent to sampling from <script type="math/tex">q_\lambda(\bz)</script>. By the <a href="https://en.wikipedia.org/wiki/Law_of_the_unconscious_statistician">Law of the Unconscious Statistician</a>, we can see that</p>
 <div class="mathblock"><script type="math/tex; mode=display">
 \begin{align}
-\nabla_\lambda \Expect_{q_\lambda(\bz)} \log \frac{p_\theta(\bx, \bz)}{q_\lambda(\bz)} = \Expect_{p(\veps)} \nabla_\lambda \log \frac{p_\theta(\bx, T(\veps; \lambda))}{q_\lambda(T(\veps; \lambda))}.
+\nabla_\lambda \Expect_{q_\lambda(\bz)} \left[\log \frac{p_\theta(\bx, \bz)}{q_\lambda(\bz)}\right] = \Expect_{p(\veps)} \left[\nabla_\lambda \log \frac{p_\theta(\bx, T(\veps; \lambda))}{q_\lambda(T(\veps; \lambda))}\right].
 \end{align}
 </script></div>
 <p>In contrast to the REINFORCE trick, the reparameterization trick is often noted empirically to have lower variance and thus results in more stable training. 
 <!-- \rs{I think there exists pathological examples where REINFORCE has lower variance than reparamterization. Should we talk about that?} --></p>
 
-<h1 id="deep-generative-model-parameterization">Deep Generative Model Parameterization</h1>
+<h1 id="parameterizing-distributions-via-deep-neural-networks">Parameterizing Distributions via Deep Neural Networks</h1>
 
 <p>So far, we have described <script type="math/tex">p_\theta(\bx, \bz)</script> and <script type="math/tex">q_\lambda(\bz)</script> in the abstract. To instantiate these objects, we consider choices of parametric distributions for <script type="math/tex">p_\theta(\bz)</script>, <script type="math/tex">p_\theta(\bx \giv \bz)</script>, and <script type="math/tex">q_\lambda(\bz)</script>. A popular choice for <script type="math/tex">p_\theta(\bz)</script> is the unit Gaussian</p>
 <div class="mathblock"><script type="math/tex; mode=display">
@@ -276,23 +277,27 @@ Illustration for the KL divergence gap between the marginal log-likelihood \(\lo
 p_\theta(\bz) = \Normal(\bz \giv \0, \I).
 \end{align}
 </script></div>
-<p>An popular alternative is a mixture of Gaussians with trainable mean and covariance parameters.</p>
+<p>in which case <script type="math/tex">\theta</script> is simply the empty set since the prior is a fixed distribution. Another alternative often used in practice is a mixture of Gaussians with trainable mean and covariance parameters.</p>
 
-<p>The conditional distribution <script type="math/tex">p_\theta(\bx \giv \bz)</script> is where we introduce a deep neural network. We note that a conditional distribution can be constructed by defining a distribution family (parameterized by <script type="math/tex">\omega \in \Omega</script>) in the target space <script type="math/tex">\bx</script> (i.e. <script type="math/tex">p_\omega(\bx)</script> defines an unconditional distribution over <script type="math/tex">\bx</script>) and a mapping function <script type="math/tex">g_\theta: \Z \to \Omega</script>. It is natural to call <script type="math/tex">g_\theta</script> the decoder that is parameterized by <script type="math/tex">\theta</script>. The act of conditioning on <script type="math/tex">\bz</script> is thus equivalent to using the choice of <script type="math/tex">\omega = g(\bz)</script>.In other words, <script type="math/tex">g_\theta</script> defines the conditional distribution</p>
+<p>The conditional distribution <script type="math/tex">p_\theta(\bx \giv \bz)</script> is where we introduce a deep neural network. We note that a conditional distribution can be constructed by defining a distribution family (parameterized by <script type="math/tex">\omega \in \Omega</script>) in the target space <script type="math/tex">\bx</script> (i.e. <script type="math/tex">p_\omega(\bx)</script> defines an unconditional distribution over <script type="math/tex">\bx</script>) and a mapping function <script type="math/tex">g_\theta: \Z \to \Omega</script>. 
+<!-- It is natural to call $$g_\theta$$ the decoder that is parameterized by $$\theta$$. The act of conditioning on $$\bz$$ is thus equivalent to using the choice of $$\omega = g(\bz)$$. --> 
+In other words, <script type="math/tex">g_\theta(\cdot)</script> defines the conditional distribution</p>
 <div class="mathblock"><script type="math/tex; mode=display">
 \begin{align}
     p_\theta(\bx \giv \bz) = p_\omega(\bx) \text{ , where } \omega = g_\theta(\bz).
 \end{align}
 </script></div>
-<p>The generative model <script type="math/tex">p_\theta(\bx, \bz)</script> is called a <em>deep</em> generative model since we will be using a neural network to instantiate the function <script type="math/tex">g_\theta</script>. In the case where <script type="math/tex">p_\theta(\bx \giv \bz)</script> is a Gaussian distribution, we can thus represent it as</p>
+<p>The function <script type="math/tex">g_\theta</script> is also referred to as the decoding distribution since it maps a latent <em>code</em> <script type="math/tex">\bz</script> to the parameters of a distribution over observed variables <script type="math/tex">\bx</script>. In practice, it is typical to specify <script type="math/tex">g_\theta</script> as a deep neural network.<br />
+<!-- The generative model $$p_\theta(\bx, \bz)$$ is called a *deep* generative model since we will be using a neural network to instantiate the function $$g_\theta$$.  -->
+In the case where <script type="math/tex">p_\theta(\bx \giv \bz)</script> is a Gaussian distribution, we can thus represent it as</p>
 <div class="mathblock"><script type="math/tex; mode=display">
 \begin{align}
     p_\theta(\bx \giv \bz) = \Normal(\bx \giv \mu_\theta(\bz), \Sigma_\theta(\bz)),
 \end{align}
 </script></div>
-<p>where <script type="math/tex">\mu_\theta(\bz)</script> and <script type="math/tex">\Sigma_\theta(\bz)</script> are neural networks that propose the mean and covariance matrix for the Gaussian distribution over <script type="math/tex">\bx</script> when conditioned on <script type="math/tex">\bz</script>.</p>
+<p>where <script type="math/tex">\mu_\theta(\bz)</script> and <script type="math/tex">\Sigma_\theta(\bz)</script> are neural networks that specify the mean and covariance matrix for the Gaussian distribution over <script type="math/tex">\bx</script> when conditioned on <script type="math/tex">\bz</script>.</p>
 
-<p>Finally, the variational family for the proposal distribution <script type="math/tex">q_\lambda(\bz)</script> needs to be chosen judiciously so that the reparameterization trick is possible. Once again, a popular choice is the Gaussian distribution, where</p>
+<p>Finally, the variational family for the proposal distribution <script type="math/tex">q_\lambda(\bz)</script> needs to be chosen judiciously so that the reparameterization trick is possible. Many continuous distributions in the <a href="https://en.wikipedia.org/wiki/Location%E2%80%93scale_family">location-scale family</a> can be reparameterized. In practice, a popular choice is again the Gaussian distribution, where</p>
 <div class="mathblock"><script type="math/tex; mode=display">
 \begin{align}
     \lambda &= (\mu, \Sigma) \\
@@ -311,7 +316,9 @@ p_\theta(\bz) = \Normal(\bz \giv \0, \I).
     \lambda^* = \argmax_{\lambda} \ELBO(\bx; \theta, \lambda).
 \end{align}
 </script></div>
-<p>For a given choice of <script type="math/tex">\theta</script>, there is a well-defined mapping from <script type="math/tex">\bx \mapsto \lambda^*</script>. A key realization is that this mapping can be <em>learned</em>. In particular, one can train an encoding function (parameterized by <script type="math/tex">\phi</script>) <script type="math/tex">f_\phi: \X \to \Lambda</script> (where <script type="math/tex">\Lambda</script> is the space of <script type="math/tex">\lambda</script> parameters) on the following objective</p>
+<p>For a given choice of <script type="math/tex">\theta</script>, there is a well-defined mapping from <script type="math/tex">\bx \mapsto \lambda^\ast</script>. A key realization is that this mapping can be <em>learned</em>. In particular, one can train an encoding function (parameterized by <script type="math/tex">\phi</script>) <script type="math/tex">f_\phi: \X \to \Lambda</script> 
+(where <script type="math/tex">\Lambda</script> is the space of <script type="math/tex">\lambda</script> parameters) 
+on the following objective</p>
 <div class="mathblock"><script type="math/tex; mode=display">
 \begin{align}
     \max_{\phi} \sum_{\bx \in \D} \ELBO(\bx; \theta, f_\phi(\bx)).
@@ -320,7 +327,7 @@ p_\theta(\bz) = \Normal(\bz \giv \0, \I).
 <p>It is worth noting at this point that <script type="math/tex">f_\phi(\bx)</script> can be interpreted as defining the conditional distribution <script type="math/tex">q_\phi(\bz \giv \bx)</script>. With a slight abuse of notation, we define</p>
 <div class="mathblock"><script type="math/tex; mode=display">
 \begin{align}
-    \ELBO(\bx; \theta, \phi) = \Expect_{q_\phi(\bz \mid \bx)} \log \frac{p_\theta(\bx, \bz)}{q_\phi(\bz \giv \bx)}.
+    \ELBO(\bx; \theta, \phi) = \Expect_{q_\phi(\bz \mid \bx)} \left[\log \frac{p_\theta(\bx, \bz)}{q_\phi(\bz \giv \bx)}\right].
 \end{align}
 </script></div>
 <p>and rewrite the optimization problem as</p>
@@ -329,14 +336,14 @@ p_\theta(\bz) = \Normal(\bz \giv \0, \I).
     \max_{\phi} \sum_{\bx \in \D} \ELBO(\bx; \theta, \phi).
 \end{align}
 </script></div>
-<p>It is also worth noting that optimizing <script type="math/tex">\phi</script> over the entire dataset as a <em>subroutine</em> everytime we sample a new mini-batch is clearly not reasonable. However, if we believe that <script type="math/tex">f_\phi</script> is capable of quickly adapting to always give a close-enough approximation of <script type="math/tex">\lambda^*</script> given the current choice of <script type="math/tex">\theta</script>, then we can interleave the optimization <script type="math/tex">\phi</script> and <script type="math/tex">\theta</script>. The yields the following procedure, where for each mini-batch <script type="math/tex">\M = \set{\bx^{(1)}, \ldots, \bx^{(m)}}</script>, we perform the following two updates jointly</p>
+<p>It is also worth noting that optimizing <script type="math/tex">\phi</script> over the entire dataset as a <em>subroutine</em> everytime we sample a new mini-batch is clearly not reasonable. However, if we believe that <script type="math/tex">f_\phi</script> is capable of quickly adapting to a close-enough approximation of <script type="math/tex">\lambda^\ast</script> given the current choice of <script type="math/tex">\theta</script>, then we can interleave the optimization <script type="math/tex">\phi</script> and <script type="math/tex">\theta</script>. The yields the following procedure, where for each mini-batch <script type="math/tex">\M = \set{\bx^{(1)}, \ldots, \bx^{(m)}}</script>, we perform the following two updates jointly</p>
 <div class="mathblock"><script type="math/tex; mode=display">
 \begin{align}
     \phi &\gets \phi + \tilde{\nabla}_\phi \sum_{\bx \in \M} \ELBO(\bx; \theta, \phi) \\
     \theta &\gets \theta + \tilde{\nabla}_\theta \sum_{\bx \in \M} \ELBO(\bx; \theta, \phi),
 \end{align}
 </script></div>
-<p>rather than running BBVI’s <strong>Step 1</strong> as a subroutine. By leveraging the learnability of <script type="math/tex">\bx \mapsto \lambda^*</script>, this optimization procedure amortizes the cost of variational inference. If one further chooses to define <script type="math/tex">f_\phi</script> as a neural network, the result is the variational autoencoder.</p>
+<p>rather than running BBVI’s <strong>Step 1</strong> as a subroutine. By leveraging the learnability of <script type="math/tex">\bx \mapsto \lambda^\ast</script>, this optimization procedure amortizes the cost of variational inference. If one further chooses to define <script type="math/tex">f_\phi</script> as a neural network, the result is the variational autoencoder.</p>
 
 <h1 id="footnotes">Footnotes</h1>
 <div class="footnotes">
