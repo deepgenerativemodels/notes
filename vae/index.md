@@ -84,7 +84,7 @@ One way to measure how closely $$p(\bx, \bz)$$ fits the observed dataset $$\D$$ 
 \end{align}
 {% endmath %}
 
-As we have seen previously, optimizing an empirical estimate of the KL divergence is equivalent to maximizing the marginal log-likelihood $$\log p(\bz)$$ over $$\D$$
+As we have seen previously, optimizing an empirical estimate of the KL divergence is equivalent to maximizing the marginal log-likelihood $$\log p(\bx)$$ over $$\D$$
 {% math %}
 \begin{align}
 \max_{p \in \P_{\bx, \bz}} \sum_{\bx \in \D} \log p(\bx) = \sum_{\bx \in \D} \log\int p(\bx, \bz) \d \bz.
