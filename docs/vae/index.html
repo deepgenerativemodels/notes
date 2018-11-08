@@ -157,7 +157,7 @@ p_\theta(\bx, \bz) = p(\bx \giv \bz)p(\bz).
 \end{align}
 </script></div>
 
-<p>As we have seen previously, optimizing an empirical estimate of the KL divergence is equivalent to maximizing the marginal log-likelihood <script type="math/tex">\log p(\bz)</script> over <script type="math/tex">\D</script></p>
+<p>As we have seen previously, optimizing an empirical estimate of the KL divergence is equivalent to maximizing the marginal log-likelihood <script type="math/tex">\log p(\bx)</script> over <script type="math/tex">\D</script></p>
 <div class="mathblock"><script type="math/tex; mode=display">
 \begin{align}
 \max_{p \in \P_{\bx, \bz}} \sum_{\bx \in \D} \log p(\bx) = \sum_{\bx \in \D} \log\int p(\bx, \bz) \d \bz.
@@ -176,7 +176,7 @@ p_\theta(\bx, \bz) = p(\bx \giv \bz)p(\bz).
 
 <p>Next, we introduce a variational family <script type="math/tex">\Q</script> of distributions that approximate the true, but intractable posterior <script type="math/tex">p(\bz \mid \bx)</script>. Further henceforth, we will assume a parameteric setting where any distribution in the model family <script type="math/tex">\P_{\bx, \bz}</script> is specified via a set of parameters <script type="math/tex">\theta \in \Theta</script> and distributions in the variational family <script type="math/tex">\Q</script> are specified via a set of parameters <script type="math/tex">\lambda \in \Lambda</script>.</p>
 
-<p>Given <script type="math/tex">\P_{\bx, \bz}</script> and <script type="math/tex">\Q</script>, we note that the following relationships hold true<sup id="fnref:2"><a href="#fn:2" class="footnote">1</a></sup> for any <script type="math/tex">\bx</script> and all variational distributions <script type="math/tex">q_\lambda(\bz) \in \Q</script></p>
+<p>Given <script type="math/tex">\P_{\bx, \bz}</script> and <script type="math/tex">\Q</script>, we note that the following relationships hold true<sup id="fnref:1"><a href="#fn:1" class="footnote">1</a></sup> for any <script type="math/tex">\bx</script> and all variational distributions <script type="math/tex">q_\lambda(\bz) \in \Q</script></p>
 
 <div class="mathblock"><script type="math/tex; mode=display">
 \begin{align}
@@ -348,8 +348,8 @@ on the following objective</p>
 <h1 id="footnotes">Footnotes</h1>
 <div class="footnotes">
   <ol>
-    <li id="fn:2">
-      <p>The first equality only holds if the support of <script type="math/tex">q</script> includes that of <script type="math/tex">p</script>. If not, it is an inequality. <a href="#fnref:2" class="reversefootnote">&#8617;</a></p>
+    <li id="fn:1">
+      <p>The first equality only holds if the support of <script type="math/tex">q</script> includes that of <script type="math/tex">p</script>. If not, it is an inequality. <a href="#fnref:1" class="reversefootnote">&#8617;</a></p>
     </li>
   </ol>
 </div>

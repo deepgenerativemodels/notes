@@ -84,7 +84,7 @@ One way to measure how closely $$p(\bx, \bz)$$ fits the observed dataset $$\D$$ 
 \end{align}
 {% endmath %}
 
-As we have seen previously, optimizing an empirical estimate of the KL divergence is equivalent to maximizing the marginal log-likelihood $$\log p(\bz)$$ over $$\D$$
+As we have seen previously, optimizing an empirical estimate of the KL divergence is equivalent to maximizing the marginal log-likelihood $$\log p(\bx)$$ over $$\D$$
 {% math %}
 \begin{align}
 \max_{p \in \P_{\bx, \bz}} \sum_{\bx \in \D} \log p(\bx) = \sum_{\bx \in \D} \log\int p(\bx, \bz) \d \bz.
@@ -106,7 +106,7 @@ Rather than maximizing the log-likelihood directly, an alternate is to instead c
 Next, we introduce a variational family $$\Q$$ of distributions that approximate the true, but intractable posterior $$p(\bz \mid \bx)$$. Further henceforth, we will assume a parameteric setting where any distribution in the model family $$\P_{\bx, \bz}$$ is specified via a set of parameters $$\theta \in \Theta$$ and distributions in the variational family $$\Q$$ are specified via a set of parameters $$\lambda \in \Lambda$$. 
 
 
-Given $$\P_{\bx, \bz}$$ and $$\Q$$, we note that the following relationships hold true[^2] for any $$\bx$$ and all variational distributions $$q_\lambda(\bz) \in \Q$$
+Given $$\P_{\bx, \bz}$$ and $$\Q$$, we note that the following relationships hold true[^1] for any $$\bx$$ and all variational distributions $$q_\lambda(\bz) \in \Q$$
 
 {% math %}
 \begin{align}
@@ -289,5 +289,4 @@ rather than running BBVI's **Step 1** as a subroutine. By leveraging the learnab
 
 Footnotes
 ==============
-[^1]: Computing the marginal likelihood $$p(\bx)$$ is at least as difficult as as computing the posterior $$p(\bz \mid \bx)$$ since by definition $$p(\bz \mid \bx) = p(\bx, \bz) / p(\bx)$$.
-[^2]: The first equality only holds if the support of $$q$$ includes that of $$p$$. If not, it is an inequality.
+[^1]: The first equality only holds if the support of $$q$$ includes that of $$p$$. If not, it is an inequality.
