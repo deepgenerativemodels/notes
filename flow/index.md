@@ -93,7 +93,7 @@ Forward mapping $$\mathbf{z} \to \mathbf{x}$$
 
 2. $$\mathbf{x}_2 = \mathbf{z}_2 + m_\theta(\mathbf{z_1})$$, where $$m_\theta$$ is a neural network.
 
-Inverse mapping $$\mathbf{z} \to \mathbf{x}$$:
+Inverse mapping $$\mathbf{x} \to \mathbf{z}$$:
 1. $$\mathbf{z}_1 = \mathbf{x}_1$$, which is an identity mapping.
 
 2. $$\mathbf{z}_2 = \mathbf{x}_2 - m_\theta(\mathbf{x_1})$$, which is the inverse of the forward transformation.
