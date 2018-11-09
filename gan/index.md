@@ -34,7 +34,7 @@ Formally, the GAN objective can be written as:
 
 {% math %}
 \min_{\theta} \max_{\phi} V(G_\theta, D_\phi) = \mathbb{E}_{\mathbf{x} \sim \textbf{p}_{\textrm{data}}}[\log D_\phi(\textbf{x})] + 
-\mathbb{E}_{\mathbf{z} \sim p(\textbf{z})}[1 - \log D_\phi(G_\theta(\textbf{z}))]
+\mathbb{E}_{\mathbf{z} \sim p(\textbf{z})}[\log (1-D_\phi(G_\theta(\textbf{z})))]
 {% endmath %}
 
 Let's unpack this expression. We know that the discriminator is maximizing this function with respect to its parameters $$\phi$$, where given a fixed generator $$G_\theta$$ it is performing binary classification: it assigns probability 1 to data points from the training set $$\mathbf{x} \sim p_{\textrm{data}}$$, and assigns probability 0 to generated samples $$\mathbf{x} \sim p_G$$. In this setup, the optimal discriminator is:
