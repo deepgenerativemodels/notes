@@ -72,7 +72,7 @@ For epochs $$1, \ldots, N$$ do:
 	{% endmath %} 
 4. Take a gradient *ascent* step on the discriminator parameters $$\phi$$:
 	{% math %}
-	\triangledown_\phi V(G_\theta, D_\phi) = \frac{1}{m} \triangledown_\phi \sum_{i=1}^m \log \left[\log D_\phi(\mathbf{x}^{(i)}) + \log (1 - D_\phi(G_\theta(\mathbf{z}^{(i)}))) \right]
+	\triangledown_\phi V(G_\theta, D_\phi) = \frac{1}{m} \triangledown_\phi \sum_{i=1}^m \left[\log D_\phi(\mathbf{x}^{(i)}) + \log (1 - D_\phi(G_\theta(\mathbf{z}^{(i)}))) \right]
 	{% endmath %} 
 
 
