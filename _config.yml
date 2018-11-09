@@ -11,6 +11,7 @@ timezone: America/New_York
 excerpt_separator: <!--more-->  # you can specify your own separator, of course.
 exclude: ['Gemfile', 'Gemfile.lock', 'Rakefile', 'README.md']
 destination: docs
+google_analytics: UA-129020129-1
 post:
   template: _post.txt
   extension: md
