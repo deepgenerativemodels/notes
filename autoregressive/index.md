@@ -28,13 +28,13 @@ Graphical model for an autoregressive Bayesian network with no conditional indep
 </figure>
 
 Such a Bayesian network that makes no conditional independence assumptions is said to obey the *autoregressive* property.
-The term *autoregressive* originates from the literature on time-series models where observations from the previous time-steps are used to predict the value at the current time step. Here, we fix an ordering of the variables $$x_1, x_2, \ldots, x_n$$ and the distribution for the $$i$$-th random variable depends on the values of all the preceeding random variables in the chosen ordering $$x_1, x_2, \ldots, x_{i-1}$$.
+The term *autoregressive* originates from the literature on time-series models where observations from the previous time-steps are used to predict the value at the current time step. Here, we fix an ordering of the variables $$x_1, x_2, \ldots, x_n$$ and the distribution for the $$i$$-th random variable depends on the values of all the preceding random variables in the chosen ordering $$x_1, x_2, \ldots, x_{i-1}$$.
 
 If we allow for every conditional $$p(x_i \vert \mathbf{x}_{< i})$$ to be specified in a tabular form, then such a representation is fully general and can represent any possible distribution over $$n$$ random variables. However, the space complexity for such a representation grows exponentially with $$n$$.
 
 To see why, let us consider the conditional for the last dimension, given by $$p(x_n \vert \mathbf{x}_{< n})$$. In order to fully specify this conditional, we need to specify a probability for $$2^{n-1}$$ configurations of the variables $$x_1, x_2, \ldots, x_{n-1}$$. Since the probabilities should sum to 1, the total number of parameters for specifying this conditional is given by $$2^{n-1} -1$$. Hence, a tabular representation for the conditionals is impractical for learning the joint distribution factorized via chain rule.
 
-In an *autoregressive generative model*, the conditionals are specified as parameterized functions with a fixed number of parameters. That is, we assume the conditional distributions $$p(x_i \vert \mathbf{x}_{< i})$$ to correspond to a Bernoulli random variable and learn a function that maps the preceeding random variables $$x_1, x_2, \ldots, x_{i-1}$$ to the
+In an *autoregressive generative model*, the conditionals are specified as parameterized functions with a fixed number of parameters. That is, we assume the conditional distributions $$p(x_i \vert \mathbf{x}_{< i})$$ to correspond to a Bernoulli random variable and learn a function that maps the preceding random variables $$x_1, x_2, \ldots, x_{i-1}$$ to the
 mean of this distribution. Hence, we have
 {% math %}
 p_{\theta_i}(x_i \vert \mathbf{x}_{< i}) = \mathrm{Bern}(f_i(x_1, x_2, \ldots, x_{i-1}))
@@ -138,7 +138,7 @@ In practice, we optimize the MLE objective using mini-batch gradient ascent. The
 
 where $$\theta^{(t+1)}$$ and $$\theta^{(t)}$$ are the parameters at iterations $$t+1$$ and $$t$$ respectively, and $$r_t$$ is the learning rate at iteration $$t$$. Typically, we only specify the initial learning rate $$r_1$$ and update the rate based on a schedule. [Variants](http://cs231n.github.io/optimization-1/) of stochastic gradient ascent, such as RMS prop and Adam, employ modified update rules that work slightly better in practice.
 
-From a practical standpoint, we must think about how to choose hyperaparameters (such as the initial learning rate) and a stopping criteria for the gradient descent. For both these questions, we follow the standard practice in machine learning of monitoring the objective on a validation dataset. Consequently, we choose the hyperparameters with the best performance on the validation dataset and stop updating the parameters when the validation log-likelihoods cease to improve[^1].
+From a practical standpoint, we must think about how to choose hyperparameters (such as the initial learning rate) and a stopping criteria for the gradient descent. For both these questions, we follow the standard practice in machine learning of monitoring the objective on a validation dataset. Consequently, we choose the hyperparameters with the best performance on the validation dataset and stop updating the parameters when the validation log-likelihoods cease to improve[^1].
 
 Now that we have a well-defined objective and optimization procedure, the only remaining task is to evaluate the objective in the context of an autoregressive generative model. To this end, we substitute the factorized joint distribution of an autoregressive model in the MLE objective to get
 
@@ -151,7 +151,7 @@ collective set of parameters for the conditionals.
 
 Inference in an autoregressive model is straightforward. For density estimation of an arbitrary point $$\mathbf{x}$$, we simply evaluate the log-conditionals $$\log p_{\theta_i}(x_i \vert \mathbf{x}_{< i})$$ for each $$i$$ and add these up to obtain the log-likelihood assigned by the model to $$\mathbf{x}$$. Since we know conditioning vector $$\mathbf{x}$$, each of the conditionals can be evaluated in parallel. Hence, density estimation is efficient on modern hardware.
 
-Sampling from an autoregressive model is a sequential procedure. Here, we first sample $$x_1$$, then we sample $$x_2$$ conditioned on the sampled $$x_1$$, followed by $$x_3$$ conditioned on both $$x_1$$ and $$x_2$$ and so on until we sample $$x_n$$ conditioned on the previously sampled $$\mathbf{x}_{< n}$$. For applications requiring real-time generation of high-dimensional data such as audio synthesis, the sequential sampling can be an expensive process. Later in this course, we will discuss how parallel Wavenet, an autoregressive model sidesteps this expensive sampling process.
+Sampling from an autoregressive model is a sequential procedure. Here, we first sample $$x_1$$, then we sample $$x_2$$ conditioned on the sampled $$x_1$$, followed by $$x_3$$ conditioned on both $$x_1$$ and $$x_2$$ and so on until we sample $$x_n$$ conditioned on the previously sampled $$\mathbf{x}_{< n}$$. For applications requiring real-time generation of high-dimensional data such as audio synthesis, the sequential sampling can be an expensive process. Later in this course, we will discuss how parallel WaveNet, an autoregressive model sidesteps this expensive sampling process.
 
 <!-- TODO: add NADE samples figure -->
 
