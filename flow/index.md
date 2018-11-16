@@ -98,7 +98,7 @@ Inverse mapping $$\mathbf{x} \to \mathbf{z}$$:
 
 2. $$\mathbf{z}_2 = \mathbf{x}_2 - m_\theta(\mathbf{x_1})$$, which is the inverse of the forward transformation.
 
-Therefore, the Jacobian of the forward mapping is lower trangular, whose determinant is simply the product of the elements on the diagonal, which is 1. Therefore, this defines a volume preserving transformation. RealNVP adds scaling factors to the transformation:
+Therefore, the Jacobian of the forward mapping is lower triangular, whose determinant is simply the product of the elements on the diagonal, which is 1. Therefore, this defines a volume preserving transformation. RealNVP adds scaling factors to the transformation:
 
 {% math %}
 
