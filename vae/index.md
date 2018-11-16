@@ -277,7 +277,7 @@ and rewrite the optimization problem as
     \max_{\phi } \sum_{\bx \in \D} \ELBO(\bx; \theta, \phi).
 \end{align}
 {% endmath %}
-It is also worth noting that optimizing $$\phi$$ over the entire dataset as a *subroutine* every time we sample a new mini-batch is clearly not reasonable. However, if we believe that $$f_\phi$$ is capable of quickly adapting to a close-enough approximation of $$\lambda^\ast$$ given the current choice of $$\theta$$, then we can interleave the optimization $$\phi$$ and $$\theta$$. The yields the following procedure, where for each mini-batch $$\M = \set{\bx^{(1)}, \ldots, \bx^{(m)}}$$, we perform the following two updates jointly
+It is also worth noting that optimizing $$\phi$$ over the entire dataset as a *subroutine* every time we sample a new mini-batch is clearly not reasonable. However, if we believe that $$f_\phi$$ is capable of quickly adapting to a close-enough approximation of $$\lambda^\ast$$ given the current choice of $$\theta$$, then we can interleave the optimization $$\phi$$ and $$\theta$$. This yields the following procedure, where for each mini-batch $$\M = \set{\bx^{(1)}, \ldots, \bx^{(m)}}$$, we perform the following two updates jointly
 {% math %}
 \begin{align}
     \phi &\gets \phi + \tilde{\nabla}_\phi \sum_{\bx \in \M} \ELBO(\bx; \theta, \phi) \\
