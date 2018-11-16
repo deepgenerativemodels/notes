@@ -28,7 +28,7 @@ Graphical model of generator $$G_\theta$$ and discriminator $$D_\phi$$.
 </figure>
 
 
-The generator and discriminator both play a two player minimax game, where the generator minimizes a two-sample test objective ($$p_{\textrm{data}} = p_\theta$$) and the discriminator maximizes the objective ($$p_{\textrm{data}} \neq p_\theta$$). Intuitively, the generator tries to fool the discriminator to the best of its ability by generating samples that look indisginguishable from $$p_{\textrm{data}}$$. 
+The generator and discriminator both play a two player minimax game, where the generator minimizes a two-sample test objective ($$p_{\textrm{data}} = p_\theta$$) and the discriminator maximizes the objective ($$p_{\textrm{data}} \neq p_\theta$$). Intuitively, the generator tries to fool the discriminator to the best of its ability by generating samples that look indistinguishable from $$p_{\textrm{data}}$$. 
 
 Formally, the GAN objective can be written as:
 
@@ -55,7 +55,7 @@ The $$D_{\textrm{JSD}}$$ term is the *Jenson-Shannon Divergence*, which is also 
 D_{\textrm{JSD}}[p, q] = \frac{1}{2} \left( D_{\textrm{KL}}\left[p, \frac{p+q}{2} \right] + D_{\textrm{KL}}\left[q, \frac{p+q}{2} \right] \right)
 {% endmath %}
 
-The JSD satisfies all properties of the KL, and has the additional perk that $$D_{\textrm{JSD}}[p,q] = D_{\textrm{JSD}}[q,p]$$. With this distance metric, the optimal generator for the GAN objective becomces $$p_G = p_{\textrm{data}}$$, and the optimal objective value that we can achieve with optimal generators and discriminators $$G^*(\cdot)$$ and $$D^*_{G^*}(\mathbf{x})$$ is $$-\log 4$$.
+The JSD satisfies all properties of the KL, and has the additional perk that $$D_{\textrm{JSD}}[p,q] = D_{\textrm{JSD}}[q,p]$$. With this distance metric, the optimal generator for the GAN objective becomes $$p_G = p_{\textrm{data}}$$, and the optimal objective value that we can achieve with optimal generators and discriminators $$G^*(\cdot)$$ and $$D^*_{G^*}(\mathbf{x})$$ is $$-\log 4$$.
 
 
 GAN training algorithm
