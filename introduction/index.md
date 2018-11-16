@@ -43,7 +43,7 @@ model distribution and the data distribution.
 
 
 For instance, we might be given access to a dataset of dog images $$\mathcal{D}$$ and
-our goal is to learn the paraemeters of  a generative model $$\theta$$ within a model family $$\mathcal{M}$$ such that
+our goal is to learn the parameters of  a generative model $$\theta$$ within a model family $$\mathcal{M}$$ such that
 the model distribution $$p_\theta$$ is close to the data distribution over dogs
 $$p_{\mathrm{data}}$$. Mathematically, we can specify our goal as the
 following optimization problem: $$$$\begin{equation}
@@ -59,7 +59,7 @@ phone camera has a resolution of approximately $$700 \times 1400$$ pixels.
 Each pixel has three channels: R(ed), G(reen) and B(lue) and each
 channel can take a value between 0 to 255. Hence, the number of possible
 images is given by $$256^{700 \times 1400 \times 3}\approx 10 ^{800000}$$.
-In contrast, Imagenet, one of the largest publicly available datasets,
+In contrast, ImageNet, one of the largest publicly available datasets,
 consists of only about 15 million images. Hence, learning a generative
 model with such a limited dataset is a highly underdetermined problem.
 
