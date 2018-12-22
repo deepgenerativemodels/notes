@@ -43,7 +43,7 @@ where $$\theta_i$$ denotes the set of parameters used to specify the mean
 function $$f_i: \{0,1\}^{i-1}\rightarrow [0,1]$$. 
 
 
-The number of parameters of an autoregressive generative model are given by $$\sum_{i=1}^n \vert \theta_i \vert$$. As we shall see in the examples below, the number of parameters are much fewer than the tabular setting considered previously. Unlike the tabular setting however, an autoregressive generative model cannot represent all possible distributions. Its expressiveness is limited by the fact that we are limiting the conditional distributions to correspond to a Bernoulli random variable with the mean specified via a restricted class of parameterized functions.
+The number of parameters of an autoregressive generative model are given by $$\sum_{i=1}^n \vert \theta_i \vert$$. As we shall see in the examples below, the number of parameters are much fewer than the tabular setting considered previously. Unlike the tabular setting, however, an autoregressive generative model cannot represent all possible distributions. Its expressiveness is limited by the fact that we are limiting the conditional distributions to correspond to a Bernoulli random variable with the mean specified via a restricted class of parameterized functions.
 
 <figure>
 <img src="fvsbn.png" alt="drawing" width="200" class="center"/>
@@ -59,7 +59,7 @@ f_i(x_1, x_2, \ldots, x_{i-1}) =\sigma(\alpha^{(i)}_0 + \alpha^{(i)}_1 x_1 + \ld
 
 where $$\sigma$$ denotes the sigmoid function and $$\theta_i=\{\alpha^{(i)}_0,\alpha^{(i)}_1, \ldots, \alpha^{(i)}_{i-1}\}$$ denote the parameters of the mean function. The conditional for variable $$i$$ requires $$i$$ parameters, and hence the total number of parameters in the model is given by $$\sum_{i=1}^ni= O(n^2)$$. Note that the number of parameters are much fewer than the exponential complexity of the tabular case.
 
-A natural way to increase the expressiveness of an autoregressive generative model is to use more flexible parameterizations for the mean function e.g., multi-layer perceptrons (MLP). For example, consider the case of a neural network with 1 hidden layer. The mean function for variable $$i$$ can be expressed as
+A natural way to increase the expressiveness of an autoregressive generative model is to use more flexible parameterizations for the mean function, e.g. multi-layer perceptrons (MLP). For example, consider the case of a neural network with 1 hidden layer. The mean function for variable $$i$$ can be expressed as
 
 {% math %}
 \mathbf{h}_i = \sigma(A_i \mathbf{x_{< i}} + \mathbf{c}_i)\\
@@ -105,14 +105,14 @@ Notice that NADE requires specifying a single, fixed ordering of the variables. 
 Learning and inference
 ======================
 
-Recall that learning a generative model involves optimizing the closeness between the data and model distributions. One commonly used notion of closeness in the KL divergence between the data and the model distributions.
+Recall that learning a generative model involves optimizing the closeness between the data and model distributions. One commonly used notion of closeness is the KL divergence between the data and the model distributions.
 
 {% math %}
 \min_{\theta\in \mathcal{M}}d_{KL}
 (p_{\mathrm{data}}, p_{\theta}) = \mathbb{E}_{\mathbf{x} \sim p_{\mathrm{data}} }\left[\log p_{\mathrm{data}}(\mathbf{x}) - \log p_{\theta}(\mathbf{x})\right]
 {% endmath %}
 
-Before moving any further, we make two comments about the KL divergence. First, we note that the KL divergence between any two distributions is asymmetric. As we navigate through this chapter, the reader is encouraged to think what could go wrong if we decided to optimize the reverse KL divergence instead. Secondly, the KL divergences heavily penalizes any model distribution $$p_\theta$$ which assigns low probability to a datapoint that is likely to be sampled under $$p_{\mathrm{data}}$$. In the extreme case, if the density $$p_\theta(\mathbf{x})$$ evaluates to zero for a datapoint sampled from $$p_{\mathrm{data}}$$, the objective evaluates to $$+\infty$$.
+Before moving any further, we make two comments about the KL divergence. First, we note that the KL divergence between any two distributions is asymmetric. As we navigate through this chapter, the reader is encouraged to think what could go wrong if we decided to optimize the reverse KL divergence instead. Secondly, the KL divergences heavily penalizes any model distribution $$p_\theta$$ which assigns a low probability to a datapoint that is likely to be sampled under $$p_{\mathrm{data}}$$. In the extreme case, if the density $$p_\theta(\mathbf{x})$$ evaluates to zero for a datapoint sampled from $$p_{\mathrm{data}}$$, the objective evaluates to $$+\infty$$.
 
 Since $$p_{\mathrm{data}}$$ does not depend on $$\theta$$, we can equivalently recover the optimal parameters via maximizing likelihood estimation.
 
@@ -138,7 +138,7 @@ In practice, we optimize the MLE objective using mini-batch gradient ascent. The
 
 where $$\theta^{(t+1)}$$ and $$\theta^{(t)}$$ are the parameters at iterations $$t+1$$ and $$t$$ respectively, and $$r_t$$ is the learning rate at iteration $$t$$. Typically, we only specify the initial learning rate $$r_1$$ and update the rate based on a schedule. [Variants](http://cs231n.github.io/optimization-1/) of stochastic gradient ascent, such as RMS prop and Adam, employ modified update rules that work slightly better in practice.
 
-From a practical standpoint, we must think about how to choose hyperparameters (such as the initial learning rate) and a stopping criteria for the gradient descent. For both these questions, we follow the standard practice in machine learning of monitoring the objective on a validation dataset. Consequently, we choose the hyperparameters with the best performance on the validation dataset and stop updating the parameters when the validation log-likelihoods cease to improve[^1].
+From a practical standpoint, we must think about how to choose hyperparameters (such as the initial learning rate) and a stopping criterion for the gradient descent. For both these questions, we follow the standard practice in machine learning of monitoring the objective on a validation dataset. Consequently, we choose the hyperparameters with the best performance on the validation dataset and stop updating the parameters when the validation log-likelihoods cease to improve[^1].
 
 Now that we have a well-defined objective and optimization procedure, the only remaining task is to evaluate the objective in the context of an autoregressive generative model. To this end, we substitute the factorized joint distribution of an autoregressive model in the MLE objective to get
 
@@ -149,13 +149,13 @@ Now that we have a well-defined objective and optimization procedure, the only r
 where $$\theta = \{\theta_1, \theta_2, \ldots, \theta_n\}$$ now denotes the
 collective set of parameters for the conditionals.
 
-Inference in an autoregressive model is straightforward. For density estimation of an arbitrary point $$\mathbf{x}$$, we simply evaluate the log-conditionals $$\log p_{\theta_i}(x_i \vert \mathbf{x}_{< i})$$ for each $$i$$ and add these up to obtain the log-likelihood assigned by the model to $$\mathbf{x}$$. Since we know conditioning vector $$\mathbf{x}$$, each of the conditionals can be evaluated in parallel. Hence, density estimation is efficient on modern hardware.
+Inference in an autoregressive model is straightforward. For density estimation of an arbitrary point $$\mathbf{x}$$, we simply evaluate the log-conditionals $$\log p_{\theta_i}(x_i \vert \mathbf{x}_{< i})$$ for each $$i$$ and add these up to obtain the log-likelihood assigned by the model to $$\mathbf{x}$$. Since we know the conditioning vector $$\mathbf{x}$$, each of the conditionals can be evaluated in parallel. Hence, density estimation is efficient on modern hardware.
 
 Sampling from an autoregressive model is a sequential procedure. Here, we first sample $$x_1$$, then we sample $$x_2$$ conditioned on the sampled $$x_1$$, followed by $$x_3$$ conditioned on both $$x_1$$ and $$x_2$$ and so on until we sample $$x_n$$ conditioned on the previously sampled $$\mathbf{x}_{< n}$$. For applications requiring real-time generation of high-dimensional data such as audio synthesis, the sequential sampling can be an expensive process. Later in this course, we will discuss how parallel WaveNet, an autoregressive model sidesteps this expensive sampling process.
 
 <!-- TODO: add NADE samples figure -->
 
-Finally, an autoregressive model does not directly learn unsupervised representations of the data. In the next few set of lectures, we will look at latent variable models (e.g., variational autoencoders) which explicitly learn latent representations of the data.
+Finally, an autoregressive model does not directly learn unsupervised representations of the data. In the next few lectures, we will look at latent variable models (e.g., variational autoencoders) which explicitly learn latent representations of the data.
 
 <!-- 
 
