@@ -6,8 +6,7 @@ title: Introduction
 Intelligent agents are constantly generating, acquiring, and processing
 data. This data could be in the form of *images* that we capture on our
 phones, *text* messages we share with our friends, *graphs* that model
-interactions on social media, *videos* that record important events,
-etc. Natural agents excel at discovering patterns, extracting
+interactions on social media, or *videos* that record important events. Natural agents excel at discovering patterns, extracting
 knowledge, and performing complex reasoning based on the data they observe. How
 can we build artificial learning systems to do the same?
 
@@ -17,7 +16,7 @@ observed data, say $$\mathcal{D}$$, as a finite set of samples from an
 underlying distribution, say $$p_{\mathrm{data}}$$. At its very core, the
 goal of any generative model is then to approximate this data
 distribution given access to the dataset $$\mathcal{D}$$. The hope is that
-if we are able to *learn* a good generative model, we can use the
+if we can *learn* a good generative model, we can use the
 learned model for downstream *inference*.
 
 Learning
@@ -32,7 +31,7 @@ limited in the family of distributions they can represent.
 In the parametric setting, we can think of the task of learning a
 generative model as picking the parameters within a family of model
 distributions that minimizes some notion of distance[^1] between the
-model distribution and the data distribution.
+model distribution and data distribution.
  
 <img src="learning_1.png" alt="drawing" width="200" class="center"/>
 
@@ -66,10 +65,10 @@ model with such a limited dataset is a highly underdetermined problem.
 Fortunately, the real world is highly structured and automatically
 discovering the underlying structure is key to learning generative
 models. For example, we can hope to learn some basic artifacts about
-dogs even with just a few images: two eyes, two ears, fur etc. Instead
+dogs even with just a few images: two eyes, two ears, fur, etc. Instead
 of incorporating this prior knowledge explicitly, we will hope the model
 learns the underlying structure directly from data. There is no free
-lunch however, and indeed successful learning of generative models will
+lunch, however, and indeed successful learning of generative models will
 involve instantiating the optimization problem in
 $$(\ref{eq:learning_gm})$$ in a suitable way. In this course, we will be
 primarily interested in the following questions:
@@ -78,9 +77,9 @@ primarily interested in the following questions:
 * What is the objective function $$d(\cdot)$$?
 * What is the optimization procedure for minimizing $$d(\cdot)$$?
 
-In the next few set of lectures, we will take a deeper dive into certain
+In the next few lectures, we will take a deeper dive into certain
 families of generative models. For each model family, we will note how
-the representation is closely tied with the choice of learning objective
+the representation relates to the choice of learning objective
 and the optimization procedure.
 
 Inference
@@ -93,7 +92,7 @@ data.[^2]
 
 While the range of applications to which generative models have been
 used continue to grow, we can identify three fundamental inference
-queries for evaluating a generative model.:
+queries for evaluating a generative model:
 
 1.  *Density estimation:* Given a datapoint $$\mathbf{x}$$, what is the
     probability assigned by the model, i.e., $$p_\theta(\mathbf{x})$$?
