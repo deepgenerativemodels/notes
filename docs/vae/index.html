@@ -170,11 +170,11 @@ p_\theta(\bx, \bz) = p(\bx \giv \bz)p(\bz).
 \log p(\bx) \approx \log \frac{1}{k} \sum_{i=1}^k p(\bx \vert \bz^{(i)}) \text{, where } \bz^{(i)} \sim p(\bz)
 </script></div>
 
-<p>In practice however, optimizing the above estimate suffers from high variance in gradient estimates.</p>
+<p>In practice, however, optimizing the above estimate suffers from high variance in gradient estimates.</p>
 
 <p>Rather than maximizing the log-likelihood directly, an alternate is to instead construct a lower bound that is more amenable to optimization. To do so, we note that evaluating the marginal likelihood <script type="math/tex">p(\bx)</script> is at least as difficult as as evaluating the posterior <script type="math/tex">p(\bz \mid \bx)</script> for any latent vector <script type="math/tex">\bz</script> since by definition <script type="math/tex">p(\bz \mid \bx) = p(\bx, \bz) / p(\bx)</script>.</p>
 
-<p>Next, we introduce a variational family <script type="math/tex">\Q</script> of distributions that approximate the true, but intractable posterior <script type="math/tex">p(\bz \mid \bx)</script>. Further henceforth, we will assume a parameteric setting where any distribution in the model family <script type="math/tex">\P_{\bx, \bz}</script> is specified via a set of parameters <script type="math/tex">\theta \in \Theta</script> and distributions in the variational family <script type="math/tex">\Q</script> are specified via a set of parameters <script type="math/tex">\lambda \in \Lambda</script>.</p>
+<p>Next, we introduce a variational family <script type="math/tex">\Q</script> of distributions that approximate the true, but intractable posterior <script type="math/tex">p(\bz \mid \bx)</script>. Henceforth, we will assume a parameteric setting where any distribution in the model family <script type="math/tex">\P_{\bx, \bz}</script> is specified via a set of parameters <script type="math/tex">\theta \in \Theta</script> and distributions in the variational family <script type="math/tex">\Q</script> are specified via a set of parameters <script type="math/tex">\lambda \in \Lambda</script>.</p>
 
 <p>Given <script type="math/tex">\P_{\bx, \bz}</script> and <script type="math/tex">\Q</script>, we note that the following relationships hold true<sup id="fnref:1"><a href="#fn:1" class="footnote">1</a></sup> for any <script type="math/tex">\bx</script> and all variational distributions <script type="math/tex">q_\lambda(\bz) \in \Q</script></p>
 
@@ -310,7 +310,7 @@ In the case where <script type="math/tex">p_\theta(\bx \giv \bz)</script> is a G
 
 <h1 id="amortized-variational-inference">Amortized Variational Inference</h1>
 
-<p>A noticable limitation of black-box variational inference is that <strong>Step 1</strong> executes an optimization subroutine that is computationally expensive. Recall that the goal of the <strong>Step 1</strong> is to find</p>
+<p>A noticeable limitation of black-box variational inference is that <strong>Step 1</strong> executes an optimization subroutine that is computationally expensive. Recall that the goal of the <strong>Step 1</strong> is to find</p>
 <div class="mathblock"><script type="math/tex; mode=display">
 \begin{align}
     \lambda^* = \argmax_{\lambda\in \Lambda} \ELBO(\bx; \theta, \lambda).
@@ -336,7 +336,7 @@ on the following objective</p>
     \max_{\phi } \sum_{\bx \in \D} \ELBO(\bx; \theta, \phi).
 \end{align}
 </script></div>
-<p>It is also worth noting that optimizing <script type="math/tex">\phi</script> over the entire dataset as a <em>subroutine</em> everytime we sample a new mini-batch is clearly not reasonable. However, if we believe that <script type="math/tex">f_\phi</script> is capable of quickly adapting to a close-enough approximation of <script type="math/tex">\lambda^\ast</script> given the current choice of <script type="math/tex">\theta</script>, then we can interleave the optimization <script type="math/tex">\phi</script> and <script type="math/tex">\theta</script>. The yields the following procedure, where for each mini-batch <script type="math/tex">\M = \set{\bx^{(1)}, \ldots, \bx^{(m)}}</script>, we perform the following two updates jointly</p>
+<p>It is also worth noting that optimizing <script type="math/tex">\phi</script> over the entire dataset as a <em>subroutine</em> every time we sample a new mini-batch is clearly not reasonable. However, if we believe that <script type="math/tex">f_\phi</script> is capable of quickly adapting to a close-enough approximation of <script type="math/tex">\lambda^\ast</script> given the current choice of <script type="math/tex">\theta</script>, then we can interleave the optimization <script type="math/tex">\phi</script> and <script type="math/tex">\theta</script>. This yields the following procedure, where for each mini-batch <script type="math/tex">\M = \set{\bx^{(1)}, \ldots, \bx^{(m)}}</script>, we perform the following two updates jointly</p>
 <div class="mathblock"><script type="math/tex; mode=display">
 \begin{align}
     \phi &\gets \phi + \tilde{\nabla}_\phi \sum_{\bx \in \M} \ELBO(\bx; \theta, \phi) \\

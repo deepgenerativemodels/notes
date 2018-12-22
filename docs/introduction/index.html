@@ -80,8 +80,7 @@
 <p>Intelligent agents are constantly generating, acquiring, and processing
 data. This data could be in the form of <em>images</em> that we capture on our
 phones, <em>text</em> messages we share with our friends, <em>graphs</em> that model
-interactions on social media, <em>videos</em> that record important events,
-etc. Natural agents excel at discovering patterns, extracting
+interactions on social media, or <em>videos</em> that record important events. Natural agents excel at discovering patterns, extracting
 knowledge, and performing complex reasoning based on the data they observe. How
 can we build artificial learning systems to do the same?</p>
 
@@ -91,7 +90,7 @@ observed data, say <script type="math/tex">\mathcal{D}</script>, as a finite set
 underlying distribution, say <script type="math/tex">p_{\mathrm{data}}</script>. At its very core, the
 goal of any generative model is then to approximate this data
 distribution given access to the dataset <script type="math/tex">\mathcal{D}</script>. The hope is that
-if we are able to <em>learn</em> a good generative model, we can use the
+if we can <em>learn</em> a good generative model, we can use the
 learned model for downstream <em>inference</em>.</p>
 
 <h2 id="learning">Learning</h2>
@@ -105,7 +104,7 @@ limited in the family of distributions they can represent.</p>
 <p>In the parametric setting, we can think of the task of learning a
 generative model as picking the parameters within a family of model
 distributions that minimizes some notion of distance<sup id="fnref:1"><a href="#fn:1" class="footnote">1</a></sup> between the
-model distribution and the data distribution.</p>
+model distribution and data distribution.</p>
 
 <p><img src="learning_1.png" alt="drawing" width="200" class="center" /></p>
 
@@ -114,7 +113,7 @@ model distribution and the data distribution.</p>
 ![goal](learning_2.png =100x20) --></p>
 
 <p>For instance, we might be given access to a dataset of dog images <script type="math/tex">\mathcal{D}</script> and
-our goal is to learn the paraemeters of  a generative model <script type="math/tex">\theta</script> within a model family <script type="math/tex">\mathcal{M}</script> such that
+our goal is to learn the parameters of  a generative model <script type="math/tex">\theta</script> within a model family <script type="math/tex">\mathcal{M}</script> such that
 the model distribution <script type="math/tex">p_\theta</script> is close to the data distribution over dogs
 <script type="math/tex">p_{\mathrm{data}}</script>. Mathematically, we can specify our goal as the
 following optimization problem: <script type="math/tex"></script>\begin{equation}
@@ -130,17 +129,17 @@ phone camera has a resolution of approximately <script type="math/tex">700 \time
 Each pixel has three channels: R(ed), G(reen) and B(lue) and each
 channel can take a value between 0 to 255. Hence, the number of possible
 images is given by <script type="math/tex">256^{700 \times 1400 \times 3}\approx 10 ^{800000}</script>.
-In contrast, Imagenet, one of the largest publicly available datasets,
+In contrast, ImageNet, one of the largest publicly available datasets,
 consists of only about 15 million images. Hence, learning a generative
 model with such a limited dataset is a highly underdetermined problem.</p>
 
 <p>Fortunately, the real world is highly structured and automatically
 discovering the underlying structure is key to learning generative
 models. For example, we can hope to learn some basic artifacts about
-dogs even with just a few images: two eyes, two ears, fur etc. Instead
+dogs even with just a few images: two eyes, two ears, fur, etc. Instead
 of incorporating this prior knowledge explicitly, we will hope the model
 learns the underlying structure directly from data. There is no free
-lunch however, and indeed successful learning of generative models will
+lunch, however, and indeed successful learning of generative models will
 involve instantiating the optimization problem in
 <script type="math/tex">(\ref{eq:learning_gm})</script> in a suitable way. In this course, we will be
 primarily interested in the following questions:</p>
@@ -151,9 +150,9 @@ primarily interested in the following questions:</p>
   <li>What is the optimization procedure for minimizing <script type="math/tex">d(\cdot)</script>?</li>
 </ul>
 
-<p>In the next few set of lectures, we will take a deeper dive into certain
+<p>In the next few lectures, we will take a deeper dive into certain
 families of generative models. For each model family, we will note how
-the representation is closely tied with the choice of learning objective
+the representation relates to the choice of learning objective
 and the optimization procedure.</p>
 
 <h2 id="inference">Inference</h2>
@@ -165,7 +164,7 @@ data.<sup id="fnref:2"><a href="#fn:2" class="footnote">2</a></sup></p>
 
 <p>While the range of applications to which generative models have been
 used continue to grow, we can identify three fundamental inference
-queries for evaluating a generative model.:</p>
+queries for evaluating a generative model:</p>
 
 <ol>
   <li>

@@ -101,7 +101,7 @@ Graphical model for an autoregressive Bayesian network with no conditional indep
 </figure>
 
 <p>Such a Bayesian network that makes no conditional independence assumptions is said to obey the <em>autoregressive</em> property.
-The term <em>autoregressive</em> originates from the literature on time-series models where observations from the previous time-steps are used to predict the value at the current time step. Here, we fix an ordering of the variables <script type="math/tex">x_1, x_2, \ldots, x_n</script> and the distribution for the <script type="math/tex">i</script>-th random variable depends on the values of all the preceeding random variables in the chosen ordering <script type="math/tex">x_1, x_2, \ldots, x_{i-1}</script>.</p>
+The term <em>autoregressive</em> originates from the literature on time-series models where observations from the previous time-steps are used to predict the value at the current time step. Here, we fix an ordering of the variables <script type="math/tex">x_1, x_2, \ldots, x_n</script> and the distribution for the <script type="math/tex">i</script>-th random variable depends on the values of all the preceding random variables in the chosen ordering <script type="math/tex">x_1, x_2, \ldots, x_{i-1}</script>.</p>
 
 <p>If we allow for every conditional <script type="math/tex">% <![CDATA[
 p(x_i \vert \mathbf{x}_{< i}) %]]></script> to be specified in a tabular form, then such a representation is fully general and can represent any possible distribution over <script type="math/tex">n</script> random variables. However, the space complexity for such a representation grows exponentially with <script type="math/tex">n</script>.</p>
@@ -110,7 +110,7 @@ p(x_i \vert \mathbf{x}_{< i}) %]]></script> to be specified in a tabular form, t
 p(x_n \vert \mathbf{x}_{< n}) %]]></script>. In order to fully specify this conditional, we need to specify a probability for <script type="math/tex">2^{n-1}</script> configurations of the variables <script type="math/tex">x_1, x_2, \ldots, x_{n-1}</script>. Since the probabilities should sum to 1, the total number of parameters for specifying this conditional is given by <script type="math/tex">2^{n-1} -1</script>. Hence, a tabular representation for the conditionals is impractical for learning the joint distribution factorized via chain rule.</p>
 
 <p>In an <em>autoregressive generative model</em>, the conditionals are specified as parameterized functions with a fixed number of parameters. That is, we assume the conditional distributions <script type="math/tex">% <![CDATA[
-p(x_i \vert \mathbf{x}_{< i}) %]]></script> to correspond to a Bernoulli random variable and learn a function that maps the preceeding random variables <script type="math/tex">x_1, x_2, \ldots, x_{i-1}</script> to the
+p(x_i \vert \mathbf{x}_{< i}) %]]></script> to correspond to a Bernoulli random variable and learn a function that maps the preceding random variables <script type="math/tex">x_1, x_2, \ldots, x_{i-1}</script> to the
 mean of this distribution. Hence, we have</p>
 <div class="mathblock"><script type="math/tex; mode=display">
 p_{\theta_i}(x_i \vert \mathbf{x}_{< i}) = \mathrm{Bern}(f_i(x_1, x_2, \ldots, x_{i-1}))
@@ -118,7 +118,7 @@ p_{\theta_i}(x_i \vert \mathbf{x}_{< i}) = \mathrm{Bern}(f_i(x_1, x_2, \ldots, x
 <p>where <script type="math/tex">\theta_i</script> denotes the set of parameters used to specify the mean
 function <script type="math/tex">f_i: \{0,1\}^{i-1}\rightarrow [0,1]</script>.</p>
 
-<p>The number of parameters of an autoregressive generative model are given by <script type="math/tex">\sum_{i=1}^n \vert \theta_i \vert</script>. As we shall see in the examples below, the number of parameters are much fewer than the tabular setting considered previously. Unlike the tabular setting however, an autoregressive generative model cannot represent all possible distributions. Its expressiveness is limited by the fact that we are limiting the conditional distributions to correspond to a Bernoulli random variable with the mean specified via a restricted class of parameterized functions.</p>
+<p>The number of parameters of an autoregressive generative model are given by <script type="math/tex">\sum_{i=1}^n \vert \theta_i \vert</script>. As we shall see in the examples below, the number of parameters are much fewer than the tabular setting considered previously. Unlike the tabular setting, however, an autoregressive generative model cannot represent all possible distributions. Its expressiveness is limited by the fact that we are limiting the conditional distributions to correspond to a Bernoulli random variable with the mean specified via a restricted class of parameterized functions.</p>
 
 <figure>
 <img src="fvsbn.png" alt="drawing" width="200" class="center" />
@@ -134,7 +134,7 @@ f_i(x_1, x_2, \ldots, x_{i-1}) =\sigma(\alpha^{(i)}_0 + \alpha^{(i)}_1 x_1 + \ld
 
 <p>where <script type="math/tex">\sigma</script> denotes the sigmoid function and <script type="math/tex">\theta_i=\{\alpha^{(i)}_0,\alpha^{(i)}_1, \ldots, \alpha^{(i)}_{i-1}\}</script> denote the parameters of the mean function. The conditional for variable <script type="math/tex">i</script> requires <script type="math/tex">i</script> parameters, and hence the total number of parameters in the model is given by <script type="math/tex">\sum_{i=1}^ni= O(n^2)</script>. Note that the number of parameters are much fewer than the exponential complexity of the tabular case.</p>
 
-<p>A natural way to increase the expressiveness of an autoregressive generative model is to use more flexible parameterizations for the mean function e.g., multi-layer perceptrons (MLP). For example, consider the case of a neural network with 1 hidden layer. The mean function for variable <script type="math/tex">i</script> can be expressed as</p>
+<p>A natural way to increase the expressiveness of an autoregressive generative model is to use more flexible parameterizations for the mean function, e.g. multi-layer perceptrons (MLP). For example, consider the case of a neural network with 1 hidden layer. The mean function for variable <script type="math/tex">i</script> can be expressed as</p>
 
 <div class="mathblock"><script type="math/tex; mode=display">
 \mathbf{h}_i = \sigma(A_i \mathbf{x_{< i}} + \mathbf{c}_i)\\
@@ -182,14 +182,14 @@ the full set of parameters for the mean functions <script type="math/tex">f_1(\c
 
 <h1 id="learning-and-inference">Learning and inference</h1>
 
-<p>Recall that learning a generative model involves optimizing the closeness between the data and model distributions. One commonly used notion of closeness in the KL divergence between the data and the model distributions.</p>
+<p>Recall that learning a generative model involves optimizing the closeness between the data and model distributions. One commonly used notion of closeness is the KL divergence between the data and the model distributions.</p>
 
 <div class="mathblock"><script type="math/tex; mode=display">
 \min_{\theta\in \mathcal{M}}d_{KL}
 (p_{\mathrm{data}}, p_{\theta}) = \mathbb{E}_{\mathbf{x} \sim p_{\mathrm{data}} }\left[\log p_{\mathrm{data}}(\mathbf{x}) - \log p_{\theta}(\mathbf{x})\right]
 </script></div>
 
-<p>Before moving any further, we make two comments about the KL divergence. First, we note that the KL divergence between any two distributions is asymmetric. As we navigate through this chapter, the reader is encouraged to think what could go wrong if we decided to optimize the reverse KL divergence instead. Secondly, the KL divergences heavily penalizes any model distribution <script type="math/tex">p_\theta</script> which assigns low probability to a datapoint that is likely to be sampled under <script type="math/tex">p_{\mathrm{data}}</script>. In the extreme case, if the density <script type="math/tex">p_\theta(\mathbf{x})</script> evaluates to zero for a datapoint sampled from <script type="math/tex">p_{\mathrm{data}}</script>, the objective evaluates to <script type="math/tex">+\infty</script>.</p>
+<p>Before moving any further, we make two comments about the KL divergence. First, we note that the KL divergence between any two distributions is asymmetric. As we navigate through this chapter, the reader is encouraged to think what could go wrong if we decided to optimize the reverse KL divergence instead. Secondly, the KL divergences heavily penalizes any model distribution <script type="math/tex">p_\theta</script> which assigns a low probability to a datapoint that is likely to be sampled under <script type="math/tex">p_{\mathrm{data}}</script>. In the extreme case, if the density <script type="math/tex">p_\theta(\mathbf{x})</script> evaluates to zero for a datapoint sampled from <script type="math/tex">p_{\mathrm{data}}</script>, the objective evaluates to <script type="math/tex">+\infty</script>.</p>
 
 <p>Since <script type="math/tex">p_{\mathrm{data}}</script> does not depend on <script type="math/tex">\theta</script>, we can equivalently recover the optimal parameters via maximizing likelihood estimation.</p>
 
@@ -215,7 +215,7 @@ the full set of parameters for the mean functions <script type="math/tex">f_1(\c
 
 <p>where <script type="math/tex">\theta^{(t+1)}</script> and <script type="math/tex">\theta^{(t)}</script> are the parameters at iterations <script type="math/tex">t+1</script> and <script type="math/tex">t</script> respectively, and <script type="math/tex">r_t</script> is the learning rate at iteration <script type="math/tex">t</script>. Typically, we only specify the initial learning rate <script type="math/tex">r_1</script> and update the rate based on a schedule. <a href="http://cs231n.github.io/optimization-1/">Variants</a> of stochastic gradient ascent, such as RMS prop and Adam, employ modified update rules that work slightly better in practice.</p>
 
-<p>From a practical standpoint, we must think about how to choose hyperaparameters (such as the initial learning rate) and a stopping criteria for the gradient descent. For both these questions, we follow the standard practice in machine learning of monitoring the objective on a validation dataset. Consequently, we choose the hyperparameters with the best performance on the validation dataset and stop updating the parameters when the validation log-likelihoods cease to improve<sup id="fnref:1"><a href="#fn:1" class="footnote">1</a></sup>.</p>
+<p>From a practical standpoint, we must think about how to choose hyperparameters (such as the initial learning rate) and a stopping criterion for the gradient descent. For both these questions, we follow the standard practice in machine learning of monitoring the objective on a validation dataset. Consequently, we choose the hyperparameters with the best performance on the validation dataset and stop updating the parameters when the validation log-likelihoods cease to improve<sup id="fnref:1"><a href="#fn:1" class="footnote">1</a></sup>.</p>
 
 <p>Now that we have a well-defined objective and optimization procedure, the only remaining task is to evaluate the objective in the context of an autoregressive generative model. To this end, we substitute the factorized joint distribution of an autoregressive model in the MLE objective to get</p>
 
@@ -227,14 +227,14 @@ the full set of parameters for the mean functions <script type="math/tex">f_1(\c
 collective set of parameters for the conditionals.</p>
 
 <p>Inference in an autoregressive model is straightforward. For density estimation of an arbitrary point <script type="math/tex">\mathbf{x}</script>, we simply evaluate the log-conditionals <script type="math/tex">% <![CDATA[
-\log p_{\theta_i}(x_i \vert \mathbf{x}_{< i}) %]]></script> for each <script type="math/tex">i</script> and add these up to obtain the log-likelihood assigned by the model to <script type="math/tex">\mathbf{x}</script>. Since we know conditioning vector <script type="math/tex">\mathbf{x}</script>, each of the conditionals can be evaluated in parallel. Hence, density estimation is efficient on modern hardware.</p>
+\log p_{\theta_i}(x_i \vert \mathbf{x}_{< i}) %]]></script> for each <script type="math/tex">i</script> and add these up to obtain the log-likelihood assigned by the model to <script type="math/tex">\mathbf{x}</script>. Since we know the conditioning vector <script type="math/tex">\mathbf{x}</script>, each of the conditionals can be evaluated in parallel. Hence, density estimation is efficient on modern hardware.</p>
 
 <p>Sampling from an autoregressive model is a sequential procedure. Here, we first sample <script type="math/tex">x_1</script>, then we sample <script type="math/tex">x_2</script> conditioned on the sampled <script type="math/tex">x_1</script>, followed by <script type="math/tex">x_3</script> conditioned on both <script type="math/tex">x_1</script> and <script type="math/tex">x_2</script> and so on until we sample <script type="math/tex">x_n</script> conditioned on the previously sampled <script type="math/tex">% <![CDATA[
-\mathbf{x}_{< n} %]]></script>. For applications requiring real-time generation of high-dimensional data such as audio synthesis, the sequential sampling can be an expensive process. Later in this course, we will discuss how parallel Wavenet, an autoregressive model sidesteps this expensive sampling process.</p>
+\mathbf{x}_{< n} %]]></script>. For applications requiring real-time generation of high-dimensional data such as audio synthesis, the sequential sampling can be an expensive process. Later in this course, we will discuss how parallel WaveNet, an autoregressive model sidesteps this expensive sampling process.</p>
 
 <!-- TODO: add NADE samples figure -->
 
-<p>Finally, an autoregressive model does not directly learn unsupervised representations of the data. In the next few set of lectures, we will look at latent variable models (e.g., variational autoencoders) which explicitly learn latent representations of the data.</p>
+<p>Finally, an autoregressive model does not directly learn unsupervised representations of the data. In the next few lectures, we will look at latent variable models (e.g., variational autoencoders) which explicitly learn latent representations of the data.</p>
 
 <!-- 
 
