@@ -11,7 +11,7 @@ We continue our study over another type of likelihood based generative models. A
 
 The two methods have relative strengths and weaknesses. Autoregressive models provide tractable likelihoods but no direct mechanism for learning features, whereas variational autoencoders can learn feature representations but have intractable marginal likelihoods.
 
-In this section, we introduce normalizing flows a type of method that combines the best of both worlds, allowing both feature learning and tractable marginal likelihood estimation.
+In this section, we introduce normalizing flows: a type of method that combines the best of both worlds, allowing both feature learning and tractable marginal likelihood estimation.
 
 # Change of Variables Formula
 
@@ -86,7 +86,7 @@ The absolute value of the determinant of the Jacobian is given by
 
 However,  $$\mathbf{u}, \mathbf{w}, b, h(\cdot)$$ need to be restricted in order to be invertible. For example, $$h = \tanh$$ and $$h'(\mathbf{w}^\top \mathbf{z} + b) \mathbf{u}^\top \mathbf{w} \geq -1$$. Note that while $$f_\theta(\mathbf{z})$$ is invertible, computing $$f_\theta^{-1}(\mathbf{z})$$ could be difficult analytically.  The following models address this problem, where both $$f_\theta$$ and $$f_\theta^{-1}$$ have simple analytical forms. 
 
-The Nonlinear Independent Components Estimation (NICE) model and Real Non-Volume Preserving (RealNVP) model composes two kinds of invertible transformations: additive coupling layers and rescaling layers. The coupling layer in NICE partitions a variable $$\mathbf{z}$$ into two disjoints subsets, say $$\mathbf{z}_1$$ and $$\mathbf{z}_2$$. Then it applies the following transformation:
+The Nonlinear Independent Components Estimation (NICE) model and Real Non-Volume Preserving (RealNVP) model composes two kinds of invertible transformations: additive coupling layers and rescaling layers. The coupling layer in NICE partitions a variable $$\mathbf{z}$$ into two disjoint subsets, say $$\mathbf{z}_1$$ and $$\mathbf{z}_2$$. Then it applies the following transformation:
 
 Forward mapping $$\mathbf{z} \to \mathbf{x}$$
 1. $$\mathbf{x}_1 = \mathbf{z}_1$$, which is an identity mapping.
