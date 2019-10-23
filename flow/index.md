@@ -47,7 +47,7 @@ There are several things to note here.
 
 We are ready to introduce normalizing flow models. Let us consider a directed, latent-variable model over observed variables $$X$$ and latent variables $$Z$$. In a **normalizing flow model**, the mapping between $$Z$$ and $$X$$, given by $$f_\theta: \mathbb{R}^n \to \mathbb{R}^n$$, is deterministic and invertible such that $$X = f_\theta(Z)$$ and $$Z  = f_\theta^{-1}(X)$$[^nf]. 
 
-![](flow-graphical.png)
+![](flow-graphical.PNG)
 
 Using change of variables, the marginal likelihood $$p(x)$$ is given by
 
@@ -112,11 +112,11 @@ Some autoregressive models can also be interpreted as flow models. For a Gaussia
 
 Masked Autoregressive Flow (MAF) uses this interpretation, where the forward mapping is an autoregressive model. However, sampling is sequential and slow, in $$O(n)$$ time where $$n$$ is the dimension of the samples.
 
-![](maf.png)
+![](maf.PNG)
 
 To address the sampling problem, the Inverse Autoregressive Flow (IAF) simply inverts the generating process. In this case, generating $$\mathbf{x}$$ from the noise can be parallelized, but computing the likelihood of new data points is slow. However, for generated points the likelihood can be computed efficiently (since the noise are already obtained).
 
-![](iaf.png)
+![](iaf.PNG)
 
 Parallel WaveNet combines the best of both worlds for IAF and MAF where it uses an IAF student model to retrieve sample and a MAF teacher model to compute likelihood. The teacher model can be efficiently trained via maximum likelihood, and the student model is trained by minimizing the KL divergence between itself and the teacher model. Since computing the IAF likelihood for an IAF sample is efficient, this process is efficient.  
 
