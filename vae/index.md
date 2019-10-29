@@ -242,7 +242,7 @@ Finally, the variational family for the proposal distribution $$q_\lambda(\bz)$$
 \begin{align}
     \lambda &= (\mu, \Sigma) \\
     q_\lambda(\bz) &= \Normal(\bz \giv \mu, \Sigma)\\
-    p(\veps) &= \Normal(\bz \giv \0, \I) \\
+    p(\veps) &= \Normal(\veps \giv \0, \I) \\
     T(\veps; \lambda) &= \mu + \Sigma^{1/2}\veps,
 \end{align}
 {% endmath %}
