@@ -35,7 +35,7 @@ A natural way to increase the expressiveness of an autoregressive generative mod
 \mathbf{h}_i = \sigma(A_i \mathbf{x_{<i}} + \mathbf{c}_i)\\
 f_i(x_1, x_2, \ldots, x_{i-1}) =\sigma(\boldsymbol{\alpha}^{(i)}\mathbf{h}_i +b_i )  
 \]
-where $\mathbf{h}_i \in \mathbb{R}^d$ denotes the hidden layer activations for the MLP and$\theta_i = \{A_i \in \mathbb{R}^{d\times (i-1)},  \mathbf{c}_i \in \mathbb{R}^d, \boldsymbol{\alpha}^{(i)}\in \mathbb{R}^d, b_i \in \mathbb{R}\}$ are the set of parameters for the mean function $\mu_i(\cdot)$.  The total number of parameters in this model is dominated by the matrices $A_i$ and given by $O(n^2 d)$. 
+where $\mathbf{h}_i \in \mathbb{R}^d$ denotes the hidden layer activations for the MLP and$\theta_i = \{A_i \in \mathbb{R}^{d\times (i-1)},  \mathbf{c}_i \in \mathbb{R}^d, \boldsymbol{\alpha}^{(i)}\in \mathbb{R}^d, b_i \in \mathbb{R}\}$ are the set of parameters for the mean function $f_i(\cdot)$.  The total number of parameters in this model is dominated by the matrices $A_i$ and given by $O(n^2 d)$. 
 
 The Neural Autoregressive Density Estimation (NADE) provides an efficient MLP parameterization that shares parameters used for evaluating the hidden layer activations.
 \[
