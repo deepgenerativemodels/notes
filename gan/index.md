@@ -9,7 +9,7 @@ We now move onto another family of generative models called generative adversari
 Likelihood-free learning
 ==============
 
-Why not? In fact, it is not so clear that better likelihood numbers necessarily correspond to higher sample quality. We know that the *optimal generative model* will give us the best sample quality and highest test log-likelihood. However, models with high test log-likelihoods can still yield poor samples, and vice versa. To see why, consider pathological cases in which our model is comprised almost entirely of noise, or our model simply memorizes the training set. Therefore, we turn to *likelihood-free training* with the hope that optimizing a different objective will allow us to disentangle our desiderata of obtaining high likelihoods as well as high-quality samples.
+Why not? It is not clear that better likelihood numbers necessarily correspond to higher sample quality. We know that the *optimal generative model* will give us the best sample quality and highest test log-likelihood. However, models with high test log-likelihoods can still yield poor samples and vice versa. To see why, consider pathological cases in which our model is comprised almost entirely of noise, or our model memorizes the training set. Therefore, we turn to *likelihood-free training* with the hope that optimizing a different objective will allow us to disentangle our desiderata of obtaining high likelihoods as well as high-quality samples.
 
 Recall that maximum likelihood required us to evaluate the likelihood of the data under our model $$p_\theta$$. A natural way to set up a likelihood-free objective is to consider the *two-sample test*, a statistical test that determines whether or not a finite set of samples from two distributions are from the same distribution *using only samples from $$P$$ and $$Q$$*. Concretely, given $$S_1 = \{\mathbf{x} \sim P\}$$ and $$S_2 = \{\mathbf{x} \sim Q\}$$, we compute a test statistic $$T$$ according to the difference in $$S_1$$ and $$S_2$$ that, when less than a threshold $$\alpha$$, accepts the null hypothesis that $$P = Q$$. 
 
@@ -67,27 +67,27 @@ For epochs $$1, \ldots, N$$ do:
 1. Sample minibatch of size $$m$$ from data: $$\mathbf{x}^{(1)}, \ldots, \mathbf{x}^{(m)} \sim \mathcal{D}$$
 2. Sample minibatch of size $$m$$ of noise: $$\mathbf{z}^{(1)}, \ldots, \mathbf{z}^{(m)} \sim p_z$$
 3. Take a gradient *descent* step on the generator parameters $$\theta$$:
-	{% math %}
-	\triangledown_\theta V(G_\theta, D_\phi) = \frac{1}{m} \triangledown_\theta \sum_{i=1}^m \log \left(1 - D_\phi(G_\theta(\mathbf{z}^{(i)})) \right)
-	{% endmath %} 
+    {% math %}
+    \triangledown_\theta V(G_\theta, D_\phi) = \frac{1}{m} \triangledown_\theta \sum_{i=1}^m \log \left(1 - D_\phi(G_\theta(\mathbf{z}^{(i)})) \right)
+    {% endmath %} 
 4. Take a gradient *ascent* step on the discriminator parameters $$\phi$$:
-	{% math %}
-	\triangledown_\phi V(G_\theta, D_\phi) = \frac{1}{m} \triangledown_\phi \sum_{i=1}^m \left[\log D_\phi(\mathbf{x}^{(i)}) + \log (1 - D_\phi(G_\theta(\mathbf{z}^{(i)}))) \right]
-	{% endmath %} 
+    {% math %}
+    \triangledown_\phi V(G_\theta, D_\phi) = \frac{1}{m} \triangledown_\phi \sum_{i=1}^m \left[\log D_\phi(\mathbf{x}^{(i)}) + \log (1 - D_\phi(G_\theta(\mathbf{z}^{(i)}))) \right]
+    {% endmath %} 
 
 
 Challenges
 ==============
 
-Although GANs have been successfully applied to several domains and tasks, working with them in practice is challenging because of their: (1) unstable optimization procedure, (2) potential for mode collapse, (3) difficulty in evaluation.
+Although GANs have been successfully applied to several domains and tasks, working with them in practice is challenging because of their: (1) unstable optimization procedure, (2) potential for mode collapse, (3) difficulty in performance evaluation.
 
-During optimization, the generator and discriminator loss often continue to oscillate without converging to a clear stopping point. Due to the lack of a robust stopping criteria, it is difficult to know when exactly the GAN has finished training. Additionally, the generator of a GAN can often get stuck producing one of a few types of samples over and over again (mode collapse). Most fixes to these challenges are empirically driven, and there has been a significant amount of work put into developing new architectures, regularization schemes, and noise perturbations in an attempt to circumvent these issues. Soumith Chintala has a nice [link](https://github.com/soumith/ganhacks) outlining various tricks of the trade to stabilize GAN training.
+During optimization, the generator and discriminator loss often continue to oscillate without converging to a definite stopping point. Due to the lack of robust stopping criteria, it is difficult to know when exactly the GAN has finished training. Additionally, the generator of a GAN can often get stuck producing one of a few types of samples over and over again (mode collapse). Most fixes to these challenges are empirically driven, and there has been a significant amount of work put into developing new architectures, regularization schemes, and noise perturbations in an attempt to circumvent these issues. Soumith Chintala has a nice [link](https://github.com/soumith/ganhacks) outlining various tricks of the trade to stabilize GAN training.
 
 
 Selected GANs
 ==============
 
-Next, we focus our attention to a few select types of GAN architectures and explore them in more detail. 
+Next, we focus our attention on a few select types of GAN architectures and explore them in more detail. 
 
 ### f-GAN
 The [f-GAN](https://arxiv.org/abs/1606.00709) optimizes the variant of the two-sample test objective that we have discussed so far, but using a very general notion of distance: the $$f divergence$$. Given two densities $$p$$ and $$q$$, the $$f$$-divergence can be written as: 
@@ -109,7 +109,7 @@ Therefore we can choose any f-divergence that we desire, let $$p = p_{\textrm{da
 \min_\theta \max_\phi F(\theta,\phi) =  \mathbb{E}_{x \sim p_{\textrm{data}}}[T_\phi(\mathbf{x})] - \mathbb{E}_{x \sim p_{G_\theta}}[f^*(T_\phi(\mathbf{x}))]
 {% endmath %}
 
-Intuitively, we can think about this objective as the generator trying to minimize the divergence estimate, while the discriminator tries to tighten the lower bound.
+Intuitively, we can think about this objective as the generator trying to minimize the divergence estimate, while the discriminator attempts to tighten the lower bound.
 
 ### BiGAN
 We won't worry too much about the [BiGAN](https://arxiv.org/abs/1605.09782) in these notes. However, we can think about this model as one that allows us to infer latent representations even within a GAN framework.

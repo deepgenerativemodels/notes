@@ -95,7 +95,7 @@ p_\theta(\mathbf{x}) = \prod_{i=1}^{N} p_\theta(x_i \vert \mathbf{x}_{<i}) %]]><
 
 <h1 id="change-of-variables-formula">Change of Variables Formula</h1>
 
-<p>In normalizing flows, we wish to map simple distributions (easy to sample and evaluate densities) to complex ones (learned via data). The change of variables formula describe how to evaluate densities of a random variable that is a deterministic transformation from another variable.</p>
+<p>In normalizing flows, we wish to map simple distributions (easy to sample and evaluate densities) to complex ones (learned via data). The change of variables formula describes how to evaluate densities of a random variable that is a deterministic transformation from another variable.</p>
 
 <p><strong>Change of Variables</strong>: <script type="math/tex">Z</script> and <script type="math/tex">X</script> be random variables which are related by a mapping <script type="math/tex">f: \mathbb{R}^n \to \mathbb{R}^n</script> such that <script type="math/tex">X = f(Z)</script> and <script type="math/tex">Z = f^{-1}(X)</script>. Then</p>
 
@@ -135,7 +135,7 @@ p_X(\mathbb{x}) = p_Z(\mathbb{z}) \left\vert \text{det}\left(\frac{\partial f(\m
 
 <p><img src="flow-graphical.png" alt="" /></p>
 
-<p>Using change of variables, the marginal likelihood <script type="math/tex">p(x)</script> is given by</p>
+<p>Using a change of variables, the marginal likelihood <script type="math/tex">p(x)</script> is given by</p>
 
 <div class="mathblock"><script type="math/tex; mode=display">
 
@@ -150,7 +150,7 @@ p_X(\mathbb{x}; \theta) = p_Z(f_\theta^{-1}(\mathbb{x})) \left\vert \text{det}\l
   <li>“Flow” means that the invertible transformations can be composed with each other to create more complex invertible transformations.</li>
 </ol>
 
-<p>Different from autoregressive model and variational autoencoders, deep normalizing flow models require specific architectural structures.</p>
+<p>Different from autoregressive models and variational autoencoders, deep normalizing flow models require specific architectural structures.</p>
 
 <ol>
   <li>The input and output dimensions must be the same.</li>
@@ -198,7 +198,7 @@ p_X(\mathbb{x}; \theta) = p_Z(f_\theta^{-1}(\mathbb{x})) \left\vert \text{det}\l
   </li>
 </ol>
 
-<p>Therefore, the Jacobian of the forward mapping is lower trangular, whose determinant is simply the product of the elements on the diagonal, which is 1. Therefore, this defines a volume preserving transformation. RealNVP adds scaling factors to the transformation:</p>
+<p>Therefore, the Jacobian of the forward mapping is lower triangular, whose determinant is simply the product of the elements on the diagonal, which is 1. Therefore, this defines a volume preserving transformation. RealNVP adds scaling factors to the transformation:</p>
 
 <div class="mathblock"><script type="math/tex; mode=display">
 
@@ -208,24 +208,24 @@ p_X(\mathbb{x}; \theta) = p_Z(f_\theta^{-1}(\mathbb{x})) \left\vert \text{det}\l
 
 <p>where <script type="math/tex">\odot</script> denotes elementwise product. This results in a non-volume preserving transformation.</p>
 
-<p>Some autoregressive models can also be interpreted as flow models. For a Gaussian autoregressive model, one receive some Gaussian noise for each dimension of <script type="math/tex">\mathbb{x}</script>, which can be treated as the latent variables <script type="math/tex">\mathbf{z}</script>. Such transformations are also invertible, meaning that given <script type="math/tex">\mathbf{x}</script> and the model parameters, we can obtain <script type="math/tex">\mathbf{z}</script> exactly.</p>
+<p>Some autoregressive models can also be interpreted as flow models. For a Gaussian autoregressive model, one receives some Gaussian noise for each dimension of <script type="math/tex">\mathbb{x}</script>, which can be treated as the latent variables <script type="math/tex">\mathbf{z}</script>. Such transformations are also invertible, meaning that given <script type="math/tex">\mathbf{x}</script> and the model parameters, we can obtain <script type="math/tex">\mathbf{z}</script> exactly.</p>
 
 <p>Masked Autoregressive Flow (MAF) uses this interpretation, where the forward mapping is an autoregressive model. However, sampling is sequential and slow, in <script type="math/tex">O(n)</script> time where <script type="math/tex">n</script> is the dimension of the samples.</p>
 
 <p><img src="maf.png" alt="" /></p>
 
-<p>To address the sampling problem, the Inverse Autoregressive Flow (IAF) simply inverts the generating process. In this case, generating <script type="math/tex">\mathbf{x}</script> from the noise can be parallelized, but computing the likelihood of new data points is slow. However, for generated points the likelihood can be computed efficiently (since the noise are already obtained).</p>
+<p>To address the sampling problem, the Inverse Autoregressive Flow (IAF) inverts the generating process. In this case, generating <script type="math/tex">\mathbf{x}</script> from the noise can be parallelized, but computing the likelihood of new data points is slow. However, for generated points, the likelihood can be computed efficiently (since the noise is already obtained).</p>
 
 <p><img src="iaf.png" alt="" /></p>
 
-<p>Parallel WaveNet combines the best of both worlds for IAF and MAF where it uses an IAF student model to retrieve sample and a MAF teacher model to compute likelihood. The teacher model can be efficiently trained via maximum likelihood, and the student model is trained by minimizing the KL divergence between itself and the teacher model. Since computing the IAF likelihood for an IAF sample is efficient, this process is efficient.</p>
+<p>Parallel WaveNet combines the best of both worlds for IAF and MAF where it uses an IAF student model to retrieve samples and a MAF teacher model to compute likelihood. The teacher model can be efficiently trained via maximum likelihood, and the student model is trained by minimizing the KL divergence between itself and the teacher model. Since computing the IAF likelihood for an IAF sample is efficient, this process is efficient.</p>
 
 <h1 id="footnotes">Footnotes</h1>
 
 <div class="footnotes">
   <ol>
     <li id="fn:nf">
-      <p>Recall the conditions for change of variable formula. <a href="#fnref:nf" class="reversefootnote">&#8617;</a></p>
+      <p>Recall the conditions for the change of variable formula. <a href="#fnref:nf" class="reversefootnote">&#8617;</a></p>
     </li>
   </ol>
 </div>

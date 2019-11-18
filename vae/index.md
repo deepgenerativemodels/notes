@@ -97,13 +97,13 @@ However, it turns out this problem is generally intractable for high-dimensional
 \log p(\bx) \approx \log \frac{1}{k} \sum_{i=1}^k p(\bx \vert \bz^{(i)}) \text{, where } \bz^{(i)} \sim p(\bz)
 {% endmath %}
 
-In practice however, optimizing the above estimate suffers from high variance in gradient estimates. 
+In practice, however, optimizing the above estimate suffers from high variance in gradient estimates. 
 
 
 Rather than maximizing the log-likelihood directly, an alternate is to instead construct a lower bound that is more amenable to optimization. To do so, we note that evaluating the marginal likelihood $$p(\bx)$$ is at least as difficult as as evaluating the posterior $$p(\bz \mid \bx)$$ for any latent vector $$\bz$$ since by definition $$p(\bz \mid \bx) = p(\bx, \bz) / p(\bx)$$. 
 
 
-Next, we introduce a variational family $$\Q$$ of distributions that approximate the true, but intractable posterior $$p(\bz \mid \bx)$$. Further henceforth, we will assume a parameteric setting where any distribution in the model family $$\P_{\bx, \bz}$$ is specified via a set of parameters $$\theta \in \Theta$$ and distributions in the variational family $$\Q$$ are specified via a set of parameters $$\lambda \in \Lambda$$. 
+Next, we introduce a variational family $$\Q$$ of distributions that approximate the true, but intractable posterior $$p(\bz \mid \bx)$$. Henceforth, we will assume a parameteric setting where any distribution in the model family $$\P_{\bx, \bz}$$ is specified via a set of parameters $$\theta \in \Theta$$ and distributions in the variational family $$\Q$$ are specified via a set of parameters $$\lambda \in \Lambda$$. 
 
 
 Given $$\P_{\bx, \bz}$$ and $$\Q$$, we note that the following relationships hold true[^1] for any $$\bx$$ and all variational distributions $$q_\lambda(\bz) \in \Q$$

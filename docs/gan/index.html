@@ -81,7 +81,7 @@
 
 <h1 id="likelihood-free-learning">Likelihood-free learning</h1>
 
-<p>Why not? In fact, it is not so clear that better likelihood numbers necessarily correspond to higher sample quality. We know that the <em>optimal generative model</em> will give us the best sample quality and highest test log-likelihood. However, models with high test log-likelihoods can still yield poor samples, and vice versa. To see why, consider pathological cases in which our model is comprised almost entirely of noise, or our model simply memorizes the training set. Therefore, we turn to <em>likelihood-free training</em> with the hope that optimizing a different objective will allow us to disentangle our desiderata of obtaining high likelihoods as well as high-quality samples.</p>
+<p>Why not? It is not clear that better likelihood numbers necessarily correspond to higher sample quality. We know that the <em>optimal generative model</em> will give us the best sample quality and highest test log-likelihood. However, models with high test log-likelihoods can still yield poor samples and vice versa. To see why, consider pathological cases in which our model is comprised almost entirely of noise, or our model memorizes the training set. Therefore, we turn to <em>likelihood-free training</em> with the hope that optimizing a different objective will allow us to disentangle our desiderata of obtaining high likelihoods as well as high-quality samples.</p>
 
 <p>Recall that maximum likelihood required us to evaluate the likelihood of the data under our model <script type="math/tex">p_\theta</script>. A natural way to set up a likelihood-free objective is to consider the <em>two-sample test</em>, a statistical test that determines whether or not a finite set of samples from two distributions are from the same distribution <em>using only samples from <script type="math/tex">P</script> and <script type="math/tex">Q</script></em>. Concretely, given <script type="math/tex">S_1 = \{\mathbf{x} \sim P\}</script> and <script type="math/tex">S_2 = \{\mathbf{x} \sim Q\}</script>, we compute a test statistic <script type="math/tex">T</script> according to the difference in <script type="math/tex">S_1</script> and <script type="math/tex">S_2</script> that, when less than a threshold <script type="math/tex">\alpha</script>, accepts the null hypothesis that <script type="math/tex">P = Q</script>.</p>
 
@@ -98,7 +98,7 @@ Graphical model of generator $$G_\theta$$ and discriminator $$D_\phi$$.
  </figcaption> -->
 </figure>
 
-<p>The generator and discriminator both play a two player minimax game, where the generator minimizes a two-sample test objective (<script type="math/tex">p_{\textrm{data}} = p_\theta</script>) and the discriminator maximizes the objective (<script type="math/tex">p_{\textrm{data}} \neq p_\theta</script>). Intuitively, the generator tries to fool the discriminator to the best of its ability by generating samples that look indisginguishable from <script type="math/tex">p_{\textrm{data}}</script>.</p>
+<p>The generator and discriminator both play a two player minimax game, where the generator minimizes a two-sample test objective (<script type="math/tex">p_{\textrm{data}} = p_\theta</script>) and the discriminator maximizes the objective (<script type="math/tex">p_{\textrm{data}} \neq p_\theta</script>). Intuitively, the generator tries to fool the discriminator to the best of its ability by generating samples that look indistinguishable from <script type="math/tex">p_{\textrm{data}}</script>.</p>
 
 <p>Formally, the GAN objective can be written as:</p>
 
@@ -125,7 +125,7 @@ D^*_{G}(\mathbf{x}) = \frac{p_{\textrm{data}}(\mathbf{x})}{p_{\textrm{data}}(\ma
 D_{\textrm{JSD}}[p, q] = \frac{1}{2} \left( D_{\textrm{KL}}\left[p, \frac{p+q}{2} \right] + D_{\textrm{KL}}\left[q, \frac{p+q}{2} \right] \right)
 </script></div>
 
-<p>The JSD satisfies all properties of the KL, and has the additional perk that <script type="math/tex">D_{\textrm{JSD}}[p,q] = D_{\textrm{JSD}}[q,p]</script>. With this distance metric, the optimal generator for the GAN objective becomces <script type="math/tex">p_G = p_{\textrm{data}}</script>, and the optimal objective value that we can achieve with optimal generators and discriminators <script type="math/tex">G^*(\cdot)</script> and <script type="math/tex">D^*_{G^*}(\mathbf{x})</script> is <script type="math/tex">-\log 4</script>.</p>
+<p>The JSD satisfies all properties of the KL, and has the additional perk that <script type="math/tex">D_{\textrm{JSD}}[p,q] = D_{\textrm{JSD}}[q,p]</script>. With this distance metric, the optimal generator for the GAN objective becomes <script type="math/tex">p_G = p_{\textrm{data}}</script>, and the optimal objective value that we can achieve with optimal generators and discriminators <script type="math/tex">G^*(\cdot)</script> and <script type="math/tex">D^*_{G^*}(\mathbf{x})</script> is <script type="math/tex">-\log 4</script>.</p>
 
 <h1 id="gan-training-algorithm">GAN training algorithm</h1>
 
@@ -149,13 +149,13 @@ D_{\textrm{JSD}}[p, q] = \frac{1}{2} \left( D_{\textrm{KL}}\left[p, \frac{p+q}{2
 
 <h1 id="challenges">Challenges</h1>
 
-<p>Although GANs have been successfully applied to several domains and tasks, working with them in practice is challenging because of their: (1) unstable optimization procedure, (2) potential for mode collapse, (3) difficulty in evaluation.</p>
+<p>Although GANs have been successfully applied to several domains and tasks, working with them in practice is challenging because of their: (1) unstable optimization procedure, (2) potential for mode collapse, (3) difficulty in performance evaluation.</p>
 
-<p>During optimization, the generator and discriminator loss often continue to oscillate without converging to a clear stopping point. Due to the lack of a robust stopping criteria, it is difficult to know when exactly the GAN has finished training. Additionally, the generator of a GAN can often get stuck producing one of a few types of samples over and over again (mode collapse). Most fixes to these challenges are empirically driven, and there has been a significant amount of work put into developing new architectures, regularization schemes, and noise perturbations in an attempt to circumvent these issues. Soumith Chintala has a nice <a href="https://github.com/soumith/ganhacks">link</a> outlining various tricks of the trade to stabilize GAN training.</p>
+<p>During optimization, the generator and discriminator loss often continue to oscillate without converging to a definite stopping point. Due to the lack of robust stopping criteria, it is difficult to know when exactly the GAN has finished training. Additionally, the generator of a GAN can often get stuck producing one of a few types of samples over and over again (mode collapse). Most fixes to these challenges are empirically driven, and there has been a significant amount of work put into developing new architectures, regularization schemes, and noise perturbations in an attempt to circumvent these issues. Soumith Chintala has a nice <a href="https://github.com/soumith/ganhacks">link</a> outlining various tricks of the trade to stabilize GAN training.</p>
 
 <h1 id="selected-gans">Selected GANs</h1>
 
-<p>Next, we focus our attention to a few select types of GAN architectures and explore them in more detail.</p>
+<p>Next, we focus our attention on a few select types of GAN architectures and explore them in more detail.</p>
 
 <h3 id="f-gan">f-GAN</h3>
 <p>The <a href="https://arxiv.org/abs/1606.00709">f-GAN</a> optimizes the variant of the two-sample test objective that we have discussed so far, but using a very general notion of distance: the <script type="math/tex">f divergence</script>. Given two densities <script type="math/tex">p</script> and <script type="math/tex">q</script>, the <script type="math/tex">f</script>-divergence can be written as:</p>
@@ -177,7 +177,7 @@ D_f(p,q) \geq \sup_{T \in \mathcal{T}} \left(\mathbb{E}_{x \sim p}[T(\mathbf{x})
 \min_\theta \max_\phi F(\theta,\phi) =  \mathbb{E}_{x \sim p_{\textrm{data}}}[T_\phi(\mathbf{x})] - \mathbb{E}_{x \sim p_{G_\theta}}[f^*(T_\phi(\mathbf{x}))]
 </script></div>
 
-<p>Intuitively, we can think about this objective as the generator trying to minimize the divergence estimate, while the discriminator tries to tighten the lower bound.</p>
+<p>Intuitively, we can think about this objective as the generator trying to minimize the divergence estimate, while the discriminator attempts to tighten the lower bound.</p>
 
 <h3 id="bigan">BiGAN</h3>
 <p>We won’t worry too much about the <a href="https://arxiv.org/abs/1605.09782">BiGAN</a> in these notes. However, we can think about this model as one that allows us to infer latent representations even within a GAN framework.</p>

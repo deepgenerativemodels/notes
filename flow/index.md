@@ -15,7 +15,7 @@ In this section, we introduce normalizing flows: a type of method that combines 
 
 # Change of Variables Formula
 
-In normalizing flows, we wish to map simple distributions (easy to sample and evaluate densities) to complex ones (learned via data). The change of variables formula describe how to evaluate densities of a random variable that is a deterministic transformation from another variable.
+In normalizing flows, we wish to map simple distributions (easy to sample and evaluate densities) to complex ones (learned via data). The change of variables formula describes how to evaluate densities of a random variable that is a deterministic transformation from another variable.
 
 **Change of Variables**: $$Z$$ and $$X$$ be random variables which are related by a mapping $$f: \mathbb{R}^n \to \mathbb{R}^n$$ such that $$X = f(Z)$$ and $$Z = f^{-1}(X)$$. Then 
 
@@ -49,7 +49,7 @@ We are ready to introduce normalizing flow models. Let us consider a directed, l
 
 ![](flow-graphical.png)
 
-Using change of variables, the marginal likelihood $$p(x)$$ is given by
+Using a change of variables, the marginal likelihood $$p(x)$$ is given by
 
 {% math %}
 
@@ -62,7 +62,7 @@ The name “normalizing flow” can be interpreted as the following:
 1. “Normalizing” means that the change of variables gives a normalized density after applying an invertible transformation.
 2. “Flow” means that the invertible transformations can be composed with each other to create more complex invertible transformations.
 
-Different from autoregressive model and variational autoencoders, deep normalizing flow models require specific architectural structures. 
+Different from autoregressive models and variational autoencoders, deep normalizing flow models require specific architectural structures. 
 
 1. The input and output dimensions must be the same.
 2. The transformation must be invertible.
@@ -108,19 +108,19 @@ Therefore, the Jacobian of the forward mapping is lower triangular, whose determ
 
 where $$\odot$$ denotes elementwise product. This results in a non-volume preserving transformation.
 
-Some autoregressive models can also be interpreted as flow models. For a Gaussian autoregressive model, one receive some Gaussian noise for each dimension of $$\mathbb{x}$$, which can be treated as the latent variables $$\mathbf{z}$$. Such transformations are also invertible, meaning that given $$\mathbf{x}$$ and the model parameters, we can obtain $$\mathbf{z}$$ exactly.
+Some autoregressive models can also be interpreted as flow models. For a Gaussian autoregressive model, one receives some Gaussian noise for each dimension of $$\mathbb{x}$$, which can be treated as the latent variables $$\mathbf{z}$$. Such transformations are also invertible, meaning that given $$\mathbf{x}$$ and the model parameters, we can obtain $$\mathbf{z}$$ exactly.
 
 Masked Autoregressive Flow (MAF) uses this interpretation, where the forward mapping is an autoregressive model. However, sampling is sequential and slow, in $$O(n)$$ time where $$n$$ is the dimension of the samples.
 
 ![](maf.png)
 
-To address the sampling problem, the Inverse Autoregressive Flow (IAF) simply inverts the generating process. In this case, generating $$\mathbf{x}$$ from the noise can be parallelized, but computing the likelihood of new data points is slow. However, for generated points the likelihood can be computed efficiently (since the noise are already obtained).
+To address the sampling problem, the Inverse Autoregressive Flow (IAF) inverts the generating process. In this case, generating $$\mathbf{x}$$ from the noise can be parallelized, but computing the likelihood of new data points is slow. However, for generated points, the likelihood can be computed efficiently (since the noise is already obtained).
 
 ![](iaf.png)
 
-Parallel WaveNet combines the best of both worlds for IAF and MAF where it uses an IAF student model to retrieve sample and a MAF teacher model to compute likelihood. The teacher model can be efficiently trained via maximum likelihood, and the student model is trained by minimizing the KL divergence between itself and the teacher model. Since computing the IAF likelihood for an IAF sample is efficient, this process is efficient.  
+Parallel WaveNet combines the best of both worlds for IAF and MAF where it uses an IAF student model to retrieve samples and a MAF teacher model to compute likelihood. The teacher model can be efficiently trained via maximum likelihood, and the student model is trained by minimizing the KL divergence between itself and the teacher model. Since computing the IAF likelihood for an IAF sample is efficient, this process is efficient.  
 
 # Footnotes
 
-[^nf]: Recall the conditions for change of variable formula.
+[^nf]: Recall the conditions for the change of variable formula.
 
