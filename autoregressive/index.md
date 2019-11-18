@@ -98,7 +98,7 @@ the full set of parameters for the mean functions $$f_1(\cdot), f_2(\cdot), \ldo
 
 ###  Extensions to NADE
 
-The [RNADE](https://arxiv.org/abs/1306.0186) algorithm extends NADE to learn generative models over real-valued data. Here, the conditionals are modeled via a continuous distribution such as a equi-weighted mixture of $$K$$ Gaussians. Instead of learning a mean function, we know learn the means $$\mu_{i,1}, \mu_{i,2},\ldots, \mu_{i,K}$$ and variances $$\Sigma_{i,1}, \Sigma_{i,2},\ldots, \Sigma_{i,K}$$ of the $$K$$ Gaussians for every conditional. For statistical and computational efficiency, a single function $$g_i: \mathbb{R}^{i-1}\rightarrow\mathbb{R}^{2K}$$ outputs all the means and variances of the $$K$$ Gaussians for the $$i$$-th conditional distribution.
+The [RNADE](https://arxiv.org/abs/1306.0186) algorithm extends NADE to learn generative models over real-valued data. Here, the conditionals are modeled via a continuous distribution such as a equi-weighted mixture of $$K$$ Gaussians. Instead of learning a mean function, we now learn the means $$\mu_{i,1}, \mu_{i,2},\ldots, \mu_{i,K}$$ and variances $$\Sigma_{i,1}, \Sigma_{i,2},\ldots, \Sigma_{i,K}$$ of the $$K$$ Gaussians for every conditional. For statistical and computational efficiency, a single function $$g_i: \mathbb{R}^{i-1}\rightarrow\mathbb{R}^{2K}$$ outputs all the means and variances of the $$K$$ Gaussians for the $$i$$-th conditional distribution.
 
 Notice that NADE requires specifying a single, fixed ordering of the variables. The choice of ordering can lead to different models. The [EoNADE](https://arxiv.org/abs/1310.1757) algorithm allows training an ensemble of NADE models with different orderings.
 
