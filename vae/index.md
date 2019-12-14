@@ -76,7 +76,7 @@ Given a dataset $$\D = \set{\bx^{(1)}, \ldots, \bx^{(n)}}$$, we are interested i
 Learning Directed Latent Variable Models
 ==============
 
-One way to measure how closely $$p(\bx, \bz)$$ fits the observed dataset $$\D$$ is to measure the Kullback-Leibler (KL) divergence between the data distribution (which we denote as $$p_{\mathrm{data}}(\bx)$$) and the model's marginal distribution $$p(\bx) = \int p(\bx, \bz) \d \bz$$. The distribution that ``best'' fits the data is thus obtained by minimizing the KL divergence. 
+One way to measure how closely $$p(\bx, \bz)$$ fits the observed dataset $$\D$$ is to measure the Kullback-Leibler (KL) divergence between the data distribution (which we denote as $$p_{\mathrm{data}}(\bx)$$) and the model's marginal distribution $$p(\bx) = \int p(\bx, \bz) \d \bz$$. The distribution that ``best'' fits the data is thus obtained by minimizing the KL divergence.
 
 {% math %}
 \begin{align}
@@ -97,13 +97,13 @@ However, it turns out this problem is generally intractable for high-dimensional
 \log p(\bx) \approx \log \frac{1}{k} \sum_{i=1}^k p(\bx \vert \bz^{(i)}) \text{, where } \bz^{(i)} \sim p(\bz)
 {% endmath %}
 
-In practice however, optimizing the above estimate suffers from high variance in gradient estimates. 
+In practice however, optimizing the above estimate suffers from high variance in gradient estimates.
 
 
-Rather than maximizing the log-likelihood directly, an alternate is to instead construct a lower bound that is more amenable to optimization. To do so, we note that evaluating the marginal likelihood $$p(\bx)$$ is at least as difficult as as evaluating the posterior $$p(\bz \mid \bx)$$ for any latent vector $$\bz$$ since by definition $$p(\bz \mid \bx) = p(\bx, \bz) / p(\bx)$$. 
+Rather than maximizing the log-likelihood directly, an alternate is to instead construct a lower bound that is more amenable to optimization. To do so, we note that evaluating the marginal likelihood $$p(\bx)$$ is at least as difficult as as evaluating the posterior $$p(\bz \mid \bx)$$ for any latent vector $$\bz$$ since by definition $$p(\bz \mid \bx) = p(\bx, \bz) / p(\bx)$$.
 
 
-Next, we introduce a variational family $$\Q$$ of distributions that approximate the true, but intractable posterior $$p(\bz \mid \bx)$$. Further henceforth, we will assume a parameteric setting where any distribution in the model family $$\P_{\bx, \bz}$$ is specified via a set of parameters $$\theta \in \Theta$$ and distributions in the variational family $$\Q$$ are specified via a set of parameters $$\lambda \in \Lambda$$. 
+Next, we introduce a variational family $$\Q$$ of distributions that approximate the true, but intractable posterior $$p(\bz \mid \bx)$$. Further henceforth, we will assume a parameteric setting where any distribution in the model family $$\P_{\bx, \bz}$$ is specified via a set of parameters $$\theta \in \Theta$$ and distributions in the variational family $$\Q$$ are specified via a set of parameters $$\lambda \in \Lambda$$.
 
 
 Given $$\P_{\bx, \bz}$$ and $$\Q$$, we note that the following relationships hold true[^1] for any $$\bx$$ and all variational distributions $$q_\lambda(\bz) \in \Q$$
@@ -111,7 +111,7 @@ Given $$\P_{\bx, \bz}$$ and $$\Q$$, we note that the following relationships hol
 {% math %}
 \begin{align}
 \log p_\theta(\bx) &= \log \int p_\theta(\bx, \bz) \d \bz \\
-&= \log \int \frac{q_\lambda(\bz)}{q_\lambda(\bz)} p(\bx, \bz) \d \bz\\
+&= \log \int \frac{q_\lambda(\bz)}{q_\lambda(\bz)} p_\theta(\bx, \bz) \d \bz\\
 &\ge\int q_\lambda(\bz) \log \frac{p_\theta(\bx, \bz)}{q_\lambda(\bz)} \d \bz \\
 &= \Expect_{q_\lambda(\bz)} \left[\log \frac{p_\theta(\bx, \bz)}{q_\lambda(\bz)}\right] \\
 &:=\ELBO(\bx; \theta, \lambda)
@@ -123,10 +123,10 @@ where we have used Jensen's inequality in the final step. The Evidence Lower Bou
 \frac{1}{k} \sum_{i=1}^k \log \frac{p_\theta(\bx, \bz^{(i)})}{q_\lambda(\bz^{(i)})} \text{, where } \bz^{(i)} \sim q_\lambda(\bz),
 \end{align}
 {% endmath %}
-so long as it is easy to sample from and evaluate densities for $$q_\lambda(\bz)$$. 
+so long as it is easy to sample from and evaluate densities for $$q_\lambda(\bz)$$.
 
 
-Which variational distribution should we pick? Even though the above derivation holds for any choice of variational parameters $$\lambda$$, the tightness of the lower bound depends on the specific choice of $$q$$. 
+Which variational distribution should we pick? Even though the above derivation holds for any choice of variational parameters $$\lambda$$, the tightness of the lower bound depends on the specific choice of $$q$$.
 
 
 <figure>
@@ -136,7 +136,7 @@ Illustration for the KL divergence gap between the marginal log-likelihood \(\lo
  </figcaption>
 </figure>
 
-In particular, the gap between the original objective(marginal log-likelihood $$\log p_\theta(\bx) $$) and the ELBO equals the KL divergence between the approximate posterior $$q(\bz)$$ and the true posterior $$p(\bz \giv \bx)$$. The gap is zero when the variational distribution $$q_\lambda(\bz)$$ exactly matches $$p_\theta(\bz \giv \bx)$$. 
+In particular, the gap between the original objective(marginal log-likelihood $$\log p_\theta(\bx) $$) and the ELBO equals the KL divergence between the approximate posterior $$q(\bz)$$ and the true posterior $$p(\bz \giv \bx)$$. The gap is zero when the variational distribution $$q_\lambda(\bz)$$ exactly matches $$p_\theta(\bz \giv \bx)$$.
 
 
 In summary, we can learn a latent variable model by maximizing the ELBO with respect to both the model parameters $$\theta$$ and the variational parameters $$\lambda$$ for any given datapoint $$\bx$$
@@ -153,7 +153,7 @@ In summary, we can learn a latent variable model by maximizing the ELBO with res
 Black-Box Variational Inference
 ==============
 
-In this post, we shall focus on first-order stochastic gradient methods for optimizing the ELBO. These optimization techniques are desirable in that they allow us to sub-sample the dataset during optimization---but require our objective function to be differentiable with respect to the optimization variables. 
+In this post, we shall focus on first-order stochastic gradient methods for optimizing the ELBO. These optimization techniques are desirable in that they allow us to sub-sample the dataset during optimization---but require our objective function to be differentiable with respect to the optimization variables.
 <!-- As such, we shall posit for now that any $$p(\bx, \bz) \in \P_{\bx, \bz}$$ and $$q(\bz) \in \Q$$ are alternatively parameterizable as $$p_\theta(\bx, \bz)$$ and $$q_\lambda(\bz)$$ and that these distributions are differentiable with respect to $$\theta$$ and $$\lambda$$. -->
 This inspires Black-Box Variational Inference (BBVI), a general-purpose Expectation-Maximization-like algorithm for variational learning of latent variable models, where, for each mini-batch $$\M = \set{\bx^{(1)}, \ldots, \bx^{(m)}}$$, the following two steps are performed.
 
@@ -183,9 +183,16 @@ Gradient Estimation
 The gradients $$\nabla_\lambda \ELBO$$ and $$\nabla_\theta \ELBO$$ can be estimated via Monte Carlo sampling. While it is straightforward to construct an unbiased estimate of $$\nabla_\theta \ELBO$$ by simply pushing $$\nabla_\theta$$ through the expectation operator, the same cannot be said for $$\nabla_\lambda$$. Instead, we see that
 {% math %}
 \begin{align}
+\nabla_\lambda \Expect_{q_\lambda(\bz)} \left[\log \frac{p_\theta(\bx, \bz)}{q_\lambda(\bz)} \right]= \Expect_{q_\lambda(\bz)} \brac{\paren{\log \frac{p_\theta(\bx, \bz)}{q_\lambda(\bz)} - 1} \cdot \nabla_\lambda \log q_\lambda(\bz)}.
+\end{align}
+{% endmath %}
+From here, expand out and realize that this can be simplified to simply:
+{% math %}
+\begin{align}
 \nabla_\lambda \Expect_{q_\lambda(\bz)} \left[\log \frac{p_\theta(\bx, \bz)}{q_\lambda(\bz)} \right]= \Expect_{q_\lambda(\bz)} \brac{\paren{\log \frac{p_\theta(\bx, \bz)}{q_\lambda(\bz)}} \cdot \nabla_\lambda \log q_\lambda(\bz)}.
 \end{align}
 {% endmath %}
+Hint: Convince yourself that the expectation of the score function is zero.
 This equality follows from the log-derivative trick (also commonly referred to as the REINFORCE trick). The full derivation involves some simple algebraic manipulations and is left as an exercise for the reader. The gradient estimator $$\tilde{\nabla}_\lambda \ELBO$$ is thus
 {% math %}
 \begin{align}
@@ -205,11 +212,11 @@ is equivalent to sampling from $$q_\lambda(\bz)$$. By the [Law of the Unconsciou
 \nabla_\lambda \Expect_{q_\lambda(\bz)} \left[\log \frac{p_\theta(\bx, \bz)}{q_\lambda(\bz)}\right] = \Expect_{p(\veps)} \left[\nabla_\lambda \log \frac{p_\theta(\bx, T(\veps; \lambda))}{q_\lambda(T(\veps; \lambda))}\right].
 \end{align}
 {% endmath %}
-In contrast to the REINFORCE trick, the reparameterization trick is often noted empirically to have lower variance and thus results in more stable training. 
+In contrast to the REINFORCE trick, the reparameterization trick is often noted empirically to have lower variance and thus results in more stable training.
 <!-- \rs{I think there exists pathological examples where REINFORCE has lower variance than reparamterization. Should we talk about that?} -->
 
 Parameterizing Distributions via Deep Neural Networks
-============== 
+==============
 
 So far, we have described $$p_\theta(\bx, \bz)$$ and $$q_\lambda(\bz)$$ in the abstract. To instantiate these objects, we consider choices of parametric distributions for $$p_\theta(\bz)$$, $$p_\theta(\bx \giv \bz)$$, and $$q_\lambda(\bz)$$. A popular choice for $$p_\theta(\bz)$$ is the unit Gaussian
 {% math %}
@@ -217,10 +224,10 @@ So far, we have described $$p_\theta(\bx, \bz)$$ and $$q_\lambda(\bz)$$ in the a
 p_\theta(\bz) = \Normal(\bz \giv \0, \I).
 \end{align}
 {% endmath %}
-in which case $$\theta$$ is simply the empty set since the prior is a fixed distribution. Another alternative often used in practice is a mixture of Gaussians with trainable mean and covariance parameters. 
+in which case $$\theta$$ is simply the empty set since the prior is a fixed distribution. Another alternative often used in practice is a mixture of Gaussians with trainable mean and covariance parameters.
 
-The conditional distribution $$p_\theta(\bx \giv \bz)$$ is where we introduce a deep neural network. We note that a conditional distribution can be constructed by defining a distribution family (parameterized by $$\omega \in \Omega$$) in the target space $$\bx$$ (i.e. $$p_\omega(\bx)$$ defines an unconditional distribution over $$\bx$$) and a mapping function $$g_\theta: \Z \to \Omega$$. 
-<!-- It is natural to call $$g_\theta$$ the decoder that is parameterized by $$\theta$$. The act of conditioning on $$\bz$$ is thus equivalent to using the choice of $$\omega = g(\bz)$$. --> 
+The conditional distribution $$p_\theta(\bx \giv \bz)$$ is where we introduce a deep neural network. We note that a conditional distribution can be constructed by defining a distribution family (parameterized by $$\omega \in \Omega$$) in the target space $$\bx$$ (i.e. $$p_\omega(\bx)$$ defines an unconditional distribution over $$\bx$$) and a mapping function $$g_\theta: \Z \to \Omega$$.
+<!-- It is natural to call $$g_\theta$$ the decoder that is parameterized by $$\theta$$. The act of conditioning on $$\bz$$ is thus equivalent to using the choice of $$\omega = g(\bz)$$. -->
 In other words, $$g_\theta(\cdot)$$ defines the conditional distribution
 {% math %}
 \begin{align}
@@ -242,7 +249,7 @@ Finally, the variational family for the proposal distribution $$q_\lambda(\bz)$$
 \begin{align}
     \lambda &= (\mu, \Sigma) \\
     q_\lambda(\bz) &= \Normal(\bz \giv \mu, \Sigma)\\
-    p(\veps) &= \Normal(\veps \giv \0, \I) \\
+    p(\veps) &= \Normal(\bz \giv \0, \I) \\
     T(\veps; \lambda) &= \mu + \Sigma^{1/2}\veps,
 \end{align}
 {% endmath %}
@@ -257,8 +264,8 @@ A noticeable limitation of black-box variational inference is that **Step 1** ex
     \lambda^* = \argmax_{\lambda\in \Lambda} \ELBO(\bx; \theta, \lambda).
 \end{align}
 {% endmath %}
-For a given choice of $$\theta$$, there is a well-defined mapping from $$\bx \mapsto \lambda^\ast$$. A key realization is that this mapping can be *learned*. In particular, one can train an encoding function (parameterized by $$\phi$$) $$f_\phi: \X \to \Lambda$$ 
-(where $$\Lambda$$ is the space of $$\lambda$$ parameters) 
+For a given choice of $$\theta$$, there is a well-defined mapping from $$\bx \mapsto \lambda^\ast$$. A key realization is that this mapping can be *learned*. In particular, one can train an encoding function (parameterized by $$\phi$$) $$f_\phi: \X \to \Lambda$$
+(where $$\Lambda$$ is the space of $$\lambda$$ parameters)
 on the following objective
 {% math %}
 \begin{align}
@@ -271,7 +278,7 @@ It is worth noting at this point that $$f_\phi(\bx)$$ can be interpreted as defi
     \ELBO(\bx; \theta, \phi) = \Expect_{q_\phi(\bz \mid \bx)} \left[\log \frac{p_\theta(\bx, \bz)}{q_\phi(\bz \giv \bx)}\right].
 \end{align}
 {% endmath %}
-and rewrite the optimization problem as 
+and rewrite the optimization problem as
 {% math %}
 \begin{align}
     \max_{\phi } \sum_{\bx \in \D} \ELBO(\bx; \theta, \phi).
