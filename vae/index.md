@@ -45,7 +45,7 @@ Graphical model for a directed, latent variable model.
 
 In the model above, $$\bz$$ and $$\bx$$ denote the latent and observed variables respectively. The joint distribution expressed by this model is given as
 {% math %}
-p_\theta(\bx, \bz) = p(\bx \giv \bz)p(\bz).
+p(\bx, \bz) = p(\bx \giv \bz)p(\bz).
 {% endmath %}
 
 From a generative modeling perspective, this model describes a generative process for the observed data $$\bx$$ using the following procedure
