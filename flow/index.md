@@ -17,7 +17,7 @@ In this section, we introduce normalizing flows: a type of method that combines 
 
 In normalizing flows, we wish to map simple distributions (easy to sample and evaluate densities) to complex ones (learned via data). The change of variables formula describe how to evaluate densities of a random variable that is a deterministic transformation from another variable.
 
-**Change of Variables**: $$Z$$ and $$X$$ be random variables which are related by a mapping $$f: \mathbb{R}^n \to \mathbb{R}^n$$ such that $$X = f(Z)$$ and $$Z = f^{-1}(X)$$. Then 
+**Change of Variables**: Let $$Z$$ and $$X$$ be random variables which are related by a mapping $$f: \mathbb{R}^n \to \mathbb{R}^n$$ such that $$X = f(Z)$$ and $$Z = f^{-1}(X)$$. Then 
 
 {% math %}p_X(\mathbb{x}) = p_Z(f^{-1}(\mathbb{x})) \left\vert \text{det}\left(\frac{\partial f^{-1}(\mathbb{x})}{\partial \mathbb{x}}\right) \right\vert
 
@@ -84,7 +84,7 @@ The absolute value of the determinant of the Jacobian is given by
 \left\vert \text{det}\left(\frac{\partial f(\mathbb{z})}{\partial \mathbb{z}}\right) \right\vert = \left\vert 1 + h'(\mathbf{w}^\top \mathbf{z} + b) \mathbf{u}^\top \mathbf{w} \right\vert
 {% endmath %}
 
-However,  $$\mathbf{u}, \mathbf{w}, b, h(\cdot)$$ need to be restricted in order to be invertible. For example, $$h = \tanh$$ and $$h'(\mathbf{w}^\top \mathbf{z} + b) \mathbf{u}^\top \mathbf{w} \geq -1$$. Note that while $$f_\theta(\mathbf{z})$$ is invertible, computing $$f_\theta^{-1}(\mathbf{z})$$ could be difficult analytically.  The following models address this problem, where both $$f_\theta$$ and $$f_\theta^{-1}$$ have simple analytical forms. 
+However,  $$\mathbf{u}, \mathbf{w}, b, h(\cdot)$$ need to be restricted in order to be invertible. For example, $$h = \tanh$$ and $$h'(\mathbf{w}^\top \mathbf{z} + b) \mathbf{u}^\top \mathbf{w} \geq -1$$. Note that while $$f_\theta(\mathbf{z})$$ is invertible, computing $$f_\theta^{-1}(\mathbf{x})$$ could be difficult analytically.  The following models address this problem, where both $$f_\theta$$ and $$f_\theta^{-1}$$ have simple analytical forms. 
 
 The Nonlinear Independent Components Estimation (NICE) model and Real Non-Volume Preserving (RealNVP) model composes two kinds of invertible transformations: additive coupling layers and rescaling layers. The coupling layer in NICE partitions a variable $$\mathbf{z}$$ into two disjoint subsets, say $$\mathbf{z}_1$$ and $$\mathbf{z}_2$$. Then it applies the following transformation:
 
