@@ -17,7 +17,7 @@ In this section, we introduce normalizing flows: a type of method that combines 
 
 In normalizing flows, we wish to map simple distributions (easy to sample and evaluate densities) to complex ones (learned via data). The change of variables formula describe how to evaluate densities of a random variable that is a deterministic transformation from another variable.
 
-**Change of Variables**: $$Z$$ and $$X$$ be random variables which are related by a mapping $$f: \mathbb{R}^n \to \mathbb{R}^n$$ such that $$X = f(Z)$$ and $$Z = f^{-1}(X)$$. Then 
+**Change of Variables**: Let $$Z$$ and $$X$$ be random variables which are related by a mapping $$f: \mathbb{R}^n \to \mathbb{R}^n$$ such that $$X = f(Z)$$ and $$Z = f^{-1}(X)$$. Then 
 
 {% math %}p_X(\mathbb{x}) = p_Z(f^{-1}(\mathbb{x})) \left\vert \text{det}\left(\frac{\partial f^{-1}(\mathbb{x})}{\partial \mathbb{x}}\right) \right\vert
 
